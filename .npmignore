@@ -1,0 +1,7 @@
+.vscode
+dev-build
+node_modules
+scripts
+src
+tests
+tsconfig.*
