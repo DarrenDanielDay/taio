@@ -3,8 +3,8 @@
 coverage
 dev-build
 node_modules
-scripts
-src
+scriptss
 tests
 jest.config.ts
+tsconfig.*
 *.log
