@@ -1,7 +1,10 @@
 .vscode
+.husky
+coverage
 dev-build
 node_modules
 scripts
 src
 tests
-tsconfig.*
+jest.config.ts
+*.log
