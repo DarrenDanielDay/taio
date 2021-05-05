@@ -1,44 +1,50 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
-import { ImmutableIteration, iteration, Modified } from "../common/iterator";
-import { IStack } from "../interfaces";
+import { iteration, Modified } from "../common/iterator";
+import { IQueue } from "../interfaces";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
-const readonly = ReadonlyOutside<LinkedStack<unknown>>({ enumerable: true });
+
+const readonly = ReadonlyOutside<LinkedQueue<unknown>>({ enumerable: true });
+
 @Sealed
-class LinkedStack<T> implements IStack<T> {
+class LinkedQueue<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
   @iteration.modifier
-  readonly $modified!: number;
+  $modified!: number;
   @readonly.decorate<"size">(0)
-  readonly size!: number;
-  @ImmutableIteration
+  size!: number;
   *[Symbol.iterator](): Iterator<T, any, undefined> {
     yield* this.#linkedList;
   }
   @Modified
-  push(value: T) {
+  enqueue(value: T): void {
     const currentSize = this.size;
-    this.#linkedList.addFirst(value);
+    this.#linkedList.addLast(value);
     readonly.set(this, "size", currentSize + 1);
   }
   @Modified
-  pop() {
+  dequeue(): T {
     const currentSize = this.size;
     if (currentSize === 0) {
-      return invalidOperation("Stack is empty.");
+      return invalidOperation("Queue is empty.");
     }
     const { value } = this.#linkedList.head!;
     this.#linkedList.removeFirst();
     readonly.set(this, "size", currentSize - 1);
     return value;
   }
-  get top() {
+  get front(): T {
     if (this.size === 0) {
-      return invalidOperation("Stack is empty.");
+      return invalidOperation("Queue is empty.");
     }
     return this.#linkedList.head!.value;
   }
+  get back(): T {
+    if (this.size === 0) {
+      return invalidOperation("Stack is empty.");
+    }
+    return this.#linkedList.tail!.value;
+  }
 }
-Object.freeze(LinkedStack.prototype);
-
-export { LinkedStack };
+Object.freeze(LinkedQueue.prototype);
+export { LinkedQueue };

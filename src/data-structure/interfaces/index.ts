@@ -45,3 +45,16 @@ export interface ILinkedList<T> extends IContainer<T> {
   readonly head: ILinkedNode<T> | undefined;
   readonly tail: ILinkedNode<T> | undefined;
 }
+
+export interface IStack<T> extends IContainer<T> {
+  push(value: T): void;
+  pop(): T;
+  readonly top: T;
+}
+
+export interface IQueue<T> extends IContainer<T> {
+  enqueue(value: T): void;
+  dequeue(): T;
+  readonly front: T;
+  readonly back: T;
+}
