@@ -38,7 +38,7 @@ describe("search algorithm", () => {
           ({ key }) => key.toString()
         ),
       ].join("")
-    ).toBe("ai1k0jhgefbdc");
+    ).toBe("abcdefghi0j1k");
   });
   it("should be the order", () => {
     expect(
@@ -99,7 +99,7 @@ describe("search algorithm", () => {
           ({ key }) => key.toString()
         ),
       ].join("")
-    ).toBe("ai10hgefbdc");
+    ).toBe("abcdefghi01");
   });
   it("should not search deep", () => {
     const iterator = dfs<{ node: any; key: string }, string>(
@@ -116,7 +116,7 @@ describe("search algorithm", () => {
     ]
       .map((r) => (typeof r === "string" ? r : r.value))
       .join("");
-    expect(result).toBe("aihgefbdc");
+    expect(result).toBe("abefghi0j1k");
   });
   it("should not search deep", () => {
     const iterator = bfs<{ node: any; key: string }, string>(

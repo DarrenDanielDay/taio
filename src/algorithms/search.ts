@@ -16,8 +16,12 @@ export function* dfs<T, R>(
     if (deeper === false) {
       continue;
     }
+    const reverseStack = new LinkedStack<T>();
     for (const newTarget of next.call(undefined, current)) {
-      !visited.has(newTarget) && stack.push(newTarget);
+      !visited.has(newTarget) && reverseStack.push(newTarget);
+    }
+    while (!!reverseStack.size) {
+      stack.push(reverseStack.pop());
     }
   }
 }
