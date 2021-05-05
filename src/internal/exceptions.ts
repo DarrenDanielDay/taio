@@ -3,9 +3,9 @@ export function die(message?: string): never {
 }
 
 export function invalidOperation(message?: string): never {
-  return die(`Invalid operation: ${message}`);
+  return die(`Invalid Operation: ${message}`);
 }
 
 export function illegalState(message?: string): never {
-  return die(`Illegal state: ${message}`);
+  return die(`Illegal State: ${message}`);
 }

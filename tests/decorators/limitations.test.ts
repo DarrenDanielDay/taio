@@ -10,6 +10,6 @@ test("inherit sealed class", () => {
     }
   }
 
-  expect(() => new Bar()).toThrow(/Invalid operation/);
-  expect(() => new Foo()).not.toThrow(/Invalid operation/);
+  expect(() => new Bar()).toThrow(/sealed/);
+  expect(() => new Foo()).not.toThrow(/sealed/);
 });

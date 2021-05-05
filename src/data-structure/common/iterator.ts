@@ -11,20 +11,24 @@ export const ImmutableIteration = WrappedMethod<
   function* ({
     func,
   }: // @ts-expect-error
-  MethodDecoratorContext<IContainer<any>, typeof Symbol.iterator>) {
+  MethodDecoratorContext<IContainer<any>, typeof Symbol.iterator>): Generator<
+    any,
+    void,
+    undefined
+  > {
+    const lastModified = this.$modified;
     const generator = (func as (
       this: IContainer<any>
     ) => Generator<any, void, undefined>).apply(this);
-    const lastModified = this.$modified;
     for (
       let iteration = generator.next();
-      !iteration.done &&
-      (this.$modified === lastModified
-        ? true
-        : invalidOperation("Container modified in iteration."));
+      !iteration.done;
       iteration = generator.next()
     ) {
       yield iteration.value;
+      if (this.$modified !== lastModified) {
+        return invalidOperation("Container modified in iteration.");
+      }
     }
   },
   { writable: false }

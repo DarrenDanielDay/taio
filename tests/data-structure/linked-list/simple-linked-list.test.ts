@@ -101,6 +101,7 @@ describe("simple linked list", () => {
     list.addLast(4);
     const node = list.find(3);
     expect(node).toBe(list.tail?.previous);
+    expect(list.find(5)).toBeUndefined();
   });
   it("find last logic", () => {
     const list = new SimpleLinkedList<number>();
@@ -110,6 +111,7 @@ describe("simple linked list", () => {
     list.addLast(4);
     const node = list.findLast(3);
     expect(node).toBe(list.tail?.previous);
+    expect(list.findLast(5)).toBeUndefined();
   });
   it("should error when modify in iteration", () => {
     const list = new SimpleLinkedList<number>();
@@ -121,6 +123,21 @@ describe("simple linked list", () => {
     }).toThrow(/iteration/);
     describe("error just occur in iteration", () => {
       expect(list.size).toBe(2);
+    });
+  });
+  describe("empty linked list", () => {
+    let list: SimpleLinkedList<number>;
+    beforeEach(() => {
+      list = new SimpleLinkedList();
+    });
+    it("should throw when call remove", () => {
+      expect(() => list.remove(list.head!)).toThrow(/empty/);
+    });
+    it("should throw when call remove", () => {
+      expect(() => list.removeFirst()).toThrow(/empty/);
+    });
+    it("should throw when call remove", () => {
+      expect(() => list.removeLast()).toThrow(/empty/);
     });
   });
 });

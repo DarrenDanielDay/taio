@@ -1,7 +1,7 @@
 import { LinkedStack } from "../../../src/data-structure/stack/linked-stack";
 
 describe("linked stack", () => {
-  it("brace matcher", () => {
+  it("example: brace matcher", () => {
     const mapping = {
       "{": "}",
       "(": ")",
@@ -41,6 +41,22 @@ describe("linked stack", () => {
     expect(match("{[<>]}<>")).toBeTruthy();
     expect(match("{[<>}]<>")).toBeFalsy();
   });
+  it("should return top element", () => {
+    const stack = new LinkedStack<string>();
+    stack.push("asodyi");
+    stack.push("xaso");
+    expect(stack.top).toBe("xaso");
+  });
+  it("should always return top element", () => {
+    const stack = new LinkedStack<number>();
+    stack.push(Math.random());
+    stack.push(Math.random());
+    stack.push(Math.random());
+    expect(stack.top).toBe(stack.pop());
+    expect(stack.top).toBe(stack.pop());
+    expect(stack.top).toBe(stack.pop());
+  });
+
   it("throws when modify while iteration", () => {
     const stack = new LinkedStack<number>();
     stack.push(1);
@@ -48,7 +64,16 @@ describe("linked stack", () => {
       for (const number of stack) {
         stack.push(number);
       }
-    }).not.toThrow(/iteration/);
-    console.log([...stack]);
+    }).toThrow(/iteration/);
+  });
+  describe("empty stack", () => {
+    it("throws when call pop", () => {
+      expect(() => {
+        new LinkedStack<number>().pop();
+      }).toThrow(/empty/);
+    });
+    it("throws when read top", () => {
+      expect(() => new LinkedStack<number>().top).toThrow(/empty/);
+    });
   });
 });

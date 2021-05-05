@@ -1,5 +1,5 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
-import { illegalState, invalidOperation } from "../../internal/exceptions";
+import { invalidOperation } from "../../internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import { ILinkedList, ILinkedNode } from "../interfaces";
 
@@ -69,15 +69,12 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       readonly.set(this, "head", node);
       readonly.set(this, "tail", node);
     } else {
-      if (!this.tail) {
-        return illegalState("ILinkedList state is invalid.");
-      }
       const newNode = {
         previous: this.tail,
         value,
         next: undefined,
       };
-      this.tail.next = newNode;
+      this.tail!.next = newNode;
       readonly.set(this, "tail", newNode);
     }
     readonly.set(this, "size", this.size + 1);
@@ -93,27 +90,21 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       readonly.set(this, "head", node);
       readonly.set(this, "tail", node);
     } else {
-      if (!this.head) {
-        return illegalState("ILinkedList state is invalid.");
-      }
       const newNode = {
         previous: undefined,
         value,
         next: this.head,
       };
-      this.head.previous = newNode;
+      this.head!.previous = newNode;
       readonly.set(this, "head", newNode);
     }
     readonly.set(this, "size", this.size + 1);
   }
   @Modified
-  remove(node: ILinkedNode<T> | undefined): void {
+  remove(node: ILinkedNode<T>): void {
     const currentSize = this.size;
     if (currentSize === 0) {
       return invalidOperation("LinkedList is empty.");
-    }
-    if (!node) {
-      return invalidOperation("Invalid node.");
     }
     if (node === this.head) {
       readonly.set(this, "head", node.next);
@@ -131,11 +122,17 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
   }
   @Modified
   removeFirst() {
-    return this.remove(this.head);
+    if (this.size === 0) {
+      return invalidOperation("LinkedList is empty");
+    }
+    return this.remove(this.head!);
   }
   @Modified
   removeLast() {
-    return this.remove(this.tail);
+    if (this.size === 0) {
+      return invalidOperation("LinkedList is empty");
+    }
+    return this.remove(this.tail!);
   }
   find(value: T, start?: ILinkedNode<T>) {
     for (let node = start ?? this.head; !!node; node = node.next) {

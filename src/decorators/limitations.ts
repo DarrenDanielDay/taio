@@ -54,7 +54,7 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
   const propertyMap = new DefaultMap<keyof This, Property<This, keyof This>>(
     () => new Property()
   );
-  return {
+  const accessor = {
     get<Key extends keyof This>(instance: This, key: Key) {
       return propertyMap.get(key).get(instance) as This[Key];
     },
@@ -70,12 +70,12 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
             get(this: This) {
               if (!propertyMap.has(key)) {
                 const prop = new Property(initValue);
-                // @ts-expect-error
-                prop.set(this, initValue);
                 propertyMap.set(key, prop);
+                // @ts-expect-error
+                accessor.set(this, initValue);
                 return initValue;
               }
-              return propertyMap.get(key).get(this);
+              return accessor.get(this, key);
             },
             set() {
               return invalidOperation("Cannot set readonly property.");
@@ -85,4 +85,5 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
       });
     },
   };
+  return accessor;
 }
