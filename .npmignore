@@ -3,7 +3,7 @@
 coverage
 dev-build
 node_modules
-scriptss
+scripts
 tests
 jest.config.ts
 tsconfig.*
