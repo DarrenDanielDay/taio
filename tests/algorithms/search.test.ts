@@ -138,4 +138,25 @@ describe("search algorithm", () => {
       .join("");
     expect(result).toBe("abeghif");
   });
+  it("should not forever-loop", () => {
+    const a: Partial<{ a: unknown }> = {};
+    a.a = a;
+    let count = 0;
+    [
+      ...dfs(
+        a,
+        (a) => Object.keys(a).map((k) => Reflect.get(a, k)),
+        () => count++
+      ),
+    ];
+    expect(count).toBe(1);
+    [
+      ...bfs(
+        a,
+        (a) => Object.keys(a).map((k) => Reflect.get(a, k)),
+        () => count++
+      ),
+    ];
+    expect(count).toBe(2);
+  });
 });
