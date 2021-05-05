@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsc --project ./tsconfig.production.json",
-    "clean": "node ./dev-build/scripts/clean.js",
+    "clean": "ts-node --files ./scripts/clean.ts",
     "compile": "tsc",
     "dev": "yarn watch",
     "format": "prettier --write .",
@@ -25,7 +25,7 @@
     "test": "jest",
     "update": "node ./dev-build/scripts/update-packages.js",
     "watch": "tsc -w",
-    "prepare": "husky install",
+    "prepare": "husky install && yarn build",
     "publish:npm": "npm config set registry=https://registry.npmjs.org && npm publish && npm config set registry https://registry.npm.taobao.org"
   },
   "devDependencies": {
