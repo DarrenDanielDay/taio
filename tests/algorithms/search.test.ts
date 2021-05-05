@@ -113,7 +113,9 @@ describe("search algorithm", () => {
       iterator.next(false),
       iterator.next(true),
       ...iterator,
-    ].map(r => typeof r === "string" ? r : r.value).join("");
+    ]
+      .map((r) => (typeof r === "string" ? r : r.value))
+      .join("");
     expect(result).toBe("aihgefbdc");
   });
   it("should not search deep", () => {
@@ -130,8 +132,10 @@ describe("search algorithm", () => {
       iterator.next(false),
       iterator.next(false),
       iterator.next(false),
-      ...iterator
-    ].map(r => typeof r === "string" ? r : r.value).join("");
+      ...iterator,
+    ]
+      .map((r) => (typeof r === "string" ? r : r.value))
+      .join("");
     expect(result).toBe("abeghif");
   });
 });
