@@ -1,6 +1,6 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { illegalState, invalidOperation } from "../../internal/exceptions";
-import { ImmutableIteration, iteration, modify } from "../common/iterator";
+import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import { ILinkedList, ILinkedNode } from "../interfaces";
 
 const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
@@ -24,6 +24,7 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       node = node.next;
     }
   }
+  @Modified
   addBefore(node: ILinkedNode<T>, value: T) {
     const { previous } = node;
     const newNode: ILinkedNode<T> = {
@@ -39,8 +40,8 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       previous.next = newNode;
     }
     readonly.set(this, "size", this.size + 1);
-    modify.apply(this);
   }
+  @Modified
   addAfter(node: ILinkedNode<T>, value: T) {
     const { next } = node;
     const newNode: ILinkedNode<T> = {
@@ -56,9 +57,9 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       next.previous = newNode;
     }
     readonly.set(this, "size", this.size + 1);
-    modify.apply(this);
   }
-  addLast(value: T) {
+  @Modified
+  addLast(value: T): void {
     if (!this.head) {
       const node = {
         previous: undefined,
@@ -80,9 +81,9 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       readonly.set(this, "tail", newNode);
     }
     readonly.set(this, "size", this.size + 1);
-    return modify.apply(this);
   }
-  addFirst(value: T) {
+  @Modified
+  addFirst(value: T): void {
     if (!this.tail) {
       const node = {
         previous: undefined,
@@ -104,9 +105,9 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       readonly.set(this, "head", newNode);
     }
     readonly.set(this, "size", this.size + 1);
-    return modify.apply(this);
   }
-  remove(node: ILinkedNode<T> | undefined) {
+  @Modified
+  remove(node: ILinkedNode<T> | undefined): void {
     const currentSize = this.size;
     if (currentSize === 0) {
       return invalidOperation("LinkedList is empty.");
@@ -127,11 +128,12 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
       node.previous.next = undefined;
     }
     readonly.set(this, "size", currentSize - 1);
-    return modify.apply(this);
   }
+  @Modified
   removeFirst() {
     return this.remove(this.head);
   }
+  @Modified
   removeLast() {
     return this.remove(this.tail);
   }

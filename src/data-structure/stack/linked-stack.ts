@@ -1,6 +1,6 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
-import { ImmutableIteration, iteration, modify } from "../common/iterator";
+import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import { IContainer } from "../interfaces";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
 const readonly = ReadonlyOutside<LinkedStack<unknown>>({ enumerable: true });
@@ -15,13 +15,14 @@ class LinkedStack<T> implements IContainer<T> {
   *[Symbol.iterator](): Iterator<T, any, undefined> {
     yield* this.#linkedList;
   }
+  @Modified
   push(value: T) {
     const currentSize = this.size;
-    modify.apply(this);
     const result = this.#linkedList.addFirst(value);
     readonly.set(this, "size", currentSize + 1);
     return result;
   }
+  @Modified
   pop() {
     const currentSize = this.size;
     if (currentSize === 0) {
@@ -30,7 +31,6 @@ class LinkedStack<T> implements IContainer<T> {
     const { value } = this.#linkedList.head!;
     this.#linkedList.removeFirst();
     readonly.set(this, "size", currentSize - 1);
-    modify.apply(this);
     return value;
   }
   get top() {

@@ -41,4 +41,14 @@ describe("linked stack", () => {
     expect(match("{[<>]}<>")).toBeTruthy();
     expect(match("{[<>}]<>")).toBeFalsy();
   });
+  it("throws when modify while iteration", () => {
+    const stack = new LinkedStack<number>();
+    stack.push(1);
+    expect(() => {
+      for (const number of stack) {
+        stack.push(number);
+      }
+    }).not.toThrow(/iteration/);
+    console.log([...stack]);
+  });
 });
