@@ -1,0 +1,45 @@
+import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
+import { invalidOperation } from "../../internal/exceptions";
+import { ImmutableIteration, iteration, modify } from "../common/iterator";
+import { IContainer } from "../interfaces";
+import { SimpleLinkedList } from "../linked-list/simple-linked-list";
+const readonly = ReadonlyOutside<LinkedStack<unknown>>({ enumerable: true });
+@Sealed
+class LinkedStack<T> implements IContainer<T> {
+  #linkedList = new SimpleLinkedList<T>();
+  @iteration.modifier
+  readonly $modified!: number;
+  @readonly.decorate<"size">(0)
+  readonly size!: number;
+  @ImmutableIteration
+  *[Symbol.iterator](): Iterator<T, any, undefined> {
+    yield* this.#linkedList;
+  }
+  push(value: T) {
+    const currentSize = this.size;
+    modify.apply(this);
+    const result = this.#linkedList.addFirst(value);
+    readonly.set(this, "size", currentSize + 1);
+    return result;
+  }
+  pop() {
+    const currentSize = this.size;
+    if (currentSize === 0) {
+      return invalidOperation("Stack is empty.");
+    }
+    const { value } = this.#linkedList.head!;
+    this.#linkedList.removeFirst();
+    readonly.set(this, "size", currentSize - 1);
+    modify.apply(this);
+    return value;
+  }
+  get top() {
+    if (this.size === 0) {
+      return invalidOperation("Stack is empty.");
+    }
+    return this.#linkedList.head!.value;
+  }
+}
+Object.freeze(LinkedStack.prototype);
+
+export { LinkedStack };

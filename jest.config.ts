@@ -4,5 +4,6 @@ const config: InitialOptionsTsJest = {
   transform: {
     ...tsjPreset.transform,
   },
+  testMatch: [process.cwd() + "/tests/**/?(*.)+(spec|test).[jt]s?(x)"],
 };
 export default config;
