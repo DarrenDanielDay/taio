@@ -25,8 +25,7 @@
     "test": "jest",
     "update": "node ./dev-build/scripts/update-packages.js",
     "watch": "tsc -w",
-    "prepare": "husky install && yarn build",
-    "publish:npm": "npm config set registry=https://registry.npmjs.org && npm publish && npm config set registry https://registry.npm.taobao.org"
+    "prepare": "husky install && yarn build"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
@@ -39,10 +38,5 @@
     "ts-node": "^9.1.1",
     "typedoc": "^0.20.36",
     "typescript": "^4.2.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
   }
 }

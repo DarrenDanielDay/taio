@@ -6,5 +6,5 @@ node_modules
 scripts
 tests
 jest.config.ts
-tsconfig.*
+tsconfig.production.json
 *.log
