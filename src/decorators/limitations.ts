@@ -1,7 +1,7 @@
 import { DefaultMap } from "../data-structure/map/default-map";
 import { invalidOperation } from "../internal/exceptions";
 import {
-  overwriteDescriberConfig,
+  overwriteDescriptorConfig,
   PropertyConfig,
 } from "../utils/object-operation";
 import { cls, property } from "./typed";
@@ -66,7 +66,7 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
         Object.defineProperty(
           target,
           key,
-          overwriteDescriberConfig(propConfig, {
+          overwriteDescriptorConfig(propConfig, {
             get(this: This) {
               if (!propertyMap.has(key)) {
                 const prop = new Property(initValue);

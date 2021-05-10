@@ -5,7 +5,7 @@ export type PropertyConfig = WithoutKey<
   "get" | "set" | "value"
 >;
 
-export function overwriteDescriberConfig(
+export function overwriteDescriptorConfig(
   overwrite: PropertyConfig | undefined,
   descriptor: PropertyDescriptor
 ) {

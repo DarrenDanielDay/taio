@@ -1,6 +1,6 @@
 import { AnyMethod, Method, MethodKeys } from "../types/concepts";
 import {
-  overwriteDescriberConfig,
+  overwriteDescriptorConfig,
   PropertyConfig,
 } from "../utils/object-operation";
 import { method, property } from "./typed";
@@ -36,7 +36,7 @@ export function WrappedMethod<This, Key extends MethodKeys<This>>(
         ...args,
       ]);
     };
-    overwriteDescriberConfig(overwrite, descriptor);
+    overwriteDescriptorConfig(overwrite, descriptor);
     return descriptor;
   });
 }
@@ -90,7 +90,7 @@ export function Accesser<
           ...args
         );
       };
-      overwriteDescriberConfig(overwrite, describer);
+      overwriteDescriptorConfig(overwrite, describer);
       return describer;
     }
   );
