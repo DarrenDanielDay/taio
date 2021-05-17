@@ -6,8 +6,8 @@ import {
 } from "../utils/object-operation";
 import { cls, property } from "./typed";
 
-export const Sealed = cls<Function>((cls) => {
-  const proxy = new Proxy(cls, {
+export const Sealed = cls<Function>((classObject) => {
+  const proxy = new Proxy(classObject, {
     construct: function (...args) {
       if (args[2] !== proxy) {
         return invalidOperation(

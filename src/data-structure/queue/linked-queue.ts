@@ -46,5 +46,6 @@ class LinkedQueue<T> implements IQueue<T> {
     return this.#linkedList.tail!.value;
   }
 }
+Object.freeze(LinkedQueue);
 Object.freeze(LinkedQueue.prototype);
 export { LinkedQueue };

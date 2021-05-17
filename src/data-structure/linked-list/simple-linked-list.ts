@@ -151,6 +151,7 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
     return undefined;
   }
 }
+Object.freeze(SimpleLinkedList);
 Object.freeze(SimpleLinkedList.prototype);
 
 export { SimpleLinkedList };

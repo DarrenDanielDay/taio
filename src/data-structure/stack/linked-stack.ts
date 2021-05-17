@@ -39,6 +39,7 @@ class LinkedStack<T> implements IStack<T> {
     return this.#linkedList.head!.value;
   }
 }
+Object.freeze(LinkedStack);
 Object.freeze(LinkedStack.prototype);
 
 export { LinkedStack };
