@@ -1,7 +1,8 @@
+import { noop } from "../functions/common";
 import { AnyArray } from "../types/common";
 import { Func, Method } from "../types/concepts";
 
-export type Operations =
+export type Operation =
   | ApplyOperation<any, any, any, any>
   | ConstructOperation<any, any, any>
   | DefinePropertyOperation<any, any, any>
@@ -113,11 +114,11 @@ export interface SetPrototypeOfOperation<T, P> extends BaseOperation<T> {
   result: boolean;
 }
 
-export function createPureTrackerProxyHandler<T>(track: Operations[]) {
+export function createPureTrackerProxyHandler<T>(tracks: Operation[]) {
   const proxyHandler: ProxyHandler<Function> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
-      track.push({
+      tracks.push({
         type: "apply",
         result,
         argArray,
@@ -128,81 +129,82 @@ export function createPureTrackerProxyHandler<T>(track: Operations[]) {
     },
     construct(target, argArray, newTarget) {
       const result = Reflect.construct(target, argArray, newTarget);
-      track.push({ type: "construct", result, target, argArray, newTarget });
+      tracks.push({ type: "construct", result, target, argArray, newTarget });
       return result;
     },
     defineProperty(target, key, descriptor) {
       const result = Reflect.defineProperty(target, key, descriptor);
-      track.push({ type: "defineProperty", result, target, key, descriptor });
+      tracks.push({ type: "defineProperty", result, target, key, descriptor });
       return result;
     },
     deleteProperty(target, key) {
       const result = Reflect.deleteProperty(target, key);
-      track.push({ type: "deleteProperty", result, target, key });
+      tracks.push({ type: "deleteProperty", result, target, key });
       return result;
     },
     get(target, key, receiver) {
       const result = Reflect.get(target, key, receiver);
-      track.push({ type: "get", result, target, key, receiver });
+      tracks.push({ type: "get", result, target, key, receiver });
       return result;
     },
     getOwnPropertyDescriptor(target, key) {
       const result = Reflect.getOwnPropertyDescriptor(target, key);
-      track.push({ type: "getOwnPropertyDescriptor", result, target, key });
+      tracks.push({ type: "getOwnPropertyDescriptor", result, target, key });
       return result;
     },
     getPrototypeOf(target) {
       const result = Reflect.getPrototypeOf(target);
-      track.push({ type: "getPrototypeOf", result, target });
+      tracks.push({ type: "getPrototypeOf", result, target });
       return result;
     },
     has(target, key) {
       const result = Reflect.has(target, key);
-      track.push({ type: "has", result, target, key });
+      tracks.push({ type: "has", result, target, key });
       return result;
     },
     isExtensible(target) {
       const result = Reflect.isExtensible(target);
-      track.push({ type: "isExtensible", result, target });
+      tracks.push({ type: "isExtensible", result, target });
       return result;
     },
     ownKeys(target) {
       const result = Reflect.ownKeys(target);
-      track.push({ type: "ownKeys", result, target });
+      tracks.push({ type: "ownKeys", result, target });
       return result;
     },
     preventExtensions(target) {
       const result = Reflect.preventExtensions(target);
-      track.push({ type: "preventExtensions", result, target });
+      tracks.push({ type: "preventExtensions", result, target });
       return result;
     },
     set(target, key, value, receiver) {
       const result = Reflect.set(target, key, value, receiver);
-      track.push({ type: "set", result, target, key, value, receiver });
+      tracks.push({ type: "set", result, target, key, value, receiver });
       return result;
     },
     setPrototypeOf(target, prototype) {
       const result = Reflect.setPrototypeOf(target, prototype);
-      track.push({ type: "setPrototypeOf", result, target, prototype });
+      tracks.push({ type: "setPrototypeOf", result, target, prototype });
       return result;
     },
   };
   // @ts-expect-error
-  return proxyHandler as ProxyHandler<T>;
+  return proxyHandler as Required<ProxyHandler<T>>;
 }
 
 export function createExpressionAnalyser(
-  track: Operations[]
+  tracks: Operation[]
 ): ProxyHandler<object> {
-  const noop = function (): void {};
   let wrapped: Function | undefined;
   const wrapResultWithProxy = () => {
-    return (wrapped = wrapped ?? new Proxy(noop, proxyHandler));
+    wrapped = wrapped ?? new Proxy(noop, proxyHandler);
+    return wrapped;
   };
+  const pureHandler = createPureTrackerProxyHandler(tracks);
   const proxyHandler: ProxyHandler<Function> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
-      track.push({
+      tracks.push({
         type: "apply",
         result,
         argArray,
@@ -213,71 +215,53 @@ export function createExpressionAnalyser(
     },
     construct(target, argArray, newTarget) {
       const result = Reflect.construct(target, argArray, newTarget);
-      track.push({ type: "construct", result, target, argArray, newTarget });
+      tracks.push({ type: "construct", result, target, argArray, newTarget });
       return wrapResultWithProxy();
     },
     defineProperty(target, key, descriptor) {
-      const result = Reflect.defineProperty(target, key, descriptor);
-      track.push({ type: "defineProperty", result, target, key, descriptor });
-      return result;
+      return pureHandler.defineProperty.call(this, target, key, descriptor);
     },
     deleteProperty(target, key) {
-      const result = Reflect.deleteProperty(target, key);
-      track.push({ type: "deleteProperty", result, target, key });
-      return result;
+      return pureHandler.deleteProperty.call(this, target, key);
     },
     get(target, key, receiver) {
       const result = Reflect.get(target, key, receiver);
-      track.push({ type: "get", result, target, key, receiver });
+      tracks.push({ type: "get", result, target, key, receiver });
       return wrapResultWithProxy();
     },
     getOwnPropertyDescriptor(target, key) {
-      const result = Reflect.getOwnPropertyDescriptor(target, key);
-      track.push({ type: "getOwnPropertyDescriptor", result, target, key });
-      return result;
+      return pureHandler.getOwnPropertyDescriptor.call(this, target, key);
     },
     getPrototypeOf(target) {
       const result = Reflect.getPrototypeOf(target);
-      track.push({ type: "getPrototypeOf", result, target });
+      tracks.push({ type: "getPrototypeOf", result, target });
       return wrapResultWithProxy();
     },
     has(target, key) {
-      const result = Reflect.has(target, key);
-      track.push({ type: "has", result, target, key });
-      return result;
+      return pureHandler.has.call(this, target, key);
     },
     isExtensible(target) {
-      const result = Reflect.isExtensible(target);
-      track.push({ type: "isExtensible", result, target });
-      return result;
+      return pureHandler.isExtensible.call(this, target);
     },
     ownKeys(target) {
-      const result = Reflect.ownKeys(target);
-      track.push({ type: "ownKeys", result, target });
-      return result;
+      return pureHandler.ownKeys.call(this, target);
     },
     preventExtensions(target) {
-      const result = Reflect.preventExtensions(target);
-      track.push({ type: "preventExtensions", result, target });
-      return result;
+      return pureHandler.preventExtensions.call(this, target);
     },
     set(target, key, value, receiver) {
-      const result = Reflect.set(target, key, value, receiver);
-      track.push({ type: "set", result, target, key, value, receiver });
-      return result;
+      return pureHandler.set.call(this, target, key, value, receiver);
     },
     setPrototypeOf(target, prototype) {
-      const result = Reflect.setPrototypeOf(target, prototype);
-      track.push({ type: "setPrototypeOf", result, target, prototype });
-      return result;
+      return pureHandler.setPrototypeOf.call(this, target, prototype);
     },
   };
   return proxyHandler;
 }
 
 export function trackExpression<T, R>(expression: (input: T) => R) {
-  const track: Operations[] = [];
+  const track: Operation[] = [];
   const handler = createExpressionAnalyser(track);
-  Reflect.apply(expression, undefined, [new Proxy(function () {}, handler)]);
+  Reflect.apply(expression, undefined, [new Proxy(noop, handler)]);
   return track;
 }
