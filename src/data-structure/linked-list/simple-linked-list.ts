@@ -1,7 +1,7 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
-import { ILinkedList, ILinkedNode } from "../interfaces";
+import { ILinkedList, ILinkedNode } from "../interfaces/schema";
 
 const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
   enumerable: true,

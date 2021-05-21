@@ -1,7 +1,7 @@
 import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { iteration, Modified } from "../common/iterator";
-import { IQueue } from "../interfaces";
+import { IQueue } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
 
 const readonly = ReadonlyOutside<LinkedQueue<unknown>>({ enumerable: true });

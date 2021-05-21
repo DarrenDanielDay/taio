@@ -1,7 +1,7 @@
 import { MethodDecoratorContext, WrappedMethod } from "../../decorators/define";
 import { ReadonlyOutside } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
-import { IContainer } from "../interfaces";
+import { IContainer } from "../interfaces/schema";
 
 export const ImmutableIteration = WrappedMethod<
   IContainer<unknown>,
