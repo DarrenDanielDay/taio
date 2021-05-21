@@ -12,7 +12,7 @@ class LinkedStack<T> implements IStack<T> {
   @readonly.decorate<"size">(0)
   readonly size!: number;
   @ImmutableIteration
-  *[Symbol.iterator](): Iterator<T, any, undefined> {
+  *[Symbol.iterator](): Iterator<T, void, undefined> {
     yield* this.#linkedList;
   }
   @Modified

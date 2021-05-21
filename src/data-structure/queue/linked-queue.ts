@@ -13,7 +13,7 @@ class LinkedQueue<T> implements IQueue<T> {
   $modified!: number;
   @readonly.decorate<"size">(0)
   size!: number;
-  *[Symbol.iterator](): Iterator<T, any, undefined> {
+  *[Symbol.iterator](): Iterator<T, void, undefined> {
     yield* this.#linkedList;
   }
   @Modified

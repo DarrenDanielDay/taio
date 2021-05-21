@@ -1,4 +1,10 @@
-import { AnyMethod, Method, MethodKeys } from "../types/concepts";
+import {
+  AnyMethod,
+  Getter,
+  Method,
+  MethodKeys,
+  Setter,
+} from "../types/concepts";
 import {
   overwriteDescriptorConfig,
   PropertyConfig,
@@ -42,8 +48,8 @@ export function WrappedMethod<This, Key extends MethodKeys<This>>(
 }
 
 export interface Accessors<This, T> {
-  get: Method<This, [], T>;
-  set: Method<This, [T], void>;
+  get: Getter<This, T>;
+  set: Setter<This, T>;
 }
 
 export interface AccessorContext<

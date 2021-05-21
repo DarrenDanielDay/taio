@@ -4,28 +4,27 @@ import { invalidOperation } from "../../internal/exceptions";
 import { IContainer } from "../interfaces";
 
 export const ImmutableIteration = WrappedMethod<
-  IContainer<any>,
+  IContainer<unknown>,
   // @ts-expect-error
   typeof Symbol.iterator
 >(
   function* ({
     func,
-  }: // @ts-expect-error
-  MethodDecoratorContext<IContainer<any>, typeof Symbol.iterator>): Generator<
-    any,
-    void,
-    undefined
-  > {
+  }: MethodDecoratorContext<
+    IContainer<unknown>,
+    // @ts-expect-error
+    typeof Symbol.iterator
+  >): Generator<unknown, void, undefined> {
     const lastModified = this.$modified;
     const generator = (func as (
-      this: IContainer<any>
-    ) => Generator<any, void, undefined>).apply(this);
+      this: IContainer<unknown>
+    ) => Generator<unknown, void, undefined>).apply(this);
     for (
-      let iteration = generator.next();
-      !iteration.done;
-      iteration = generator.next()
+      let iterator = generator.next();
+      !iterator.done;
+      iterator = generator.next()
     ) {
-      yield iteration.value;
+      yield iterator.value;
       if (this.$modified !== lastModified) {
         return invalidOperation("Container modified in iteration.");
       }
@@ -34,15 +33,13 @@ export const ImmutableIteration = WrappedMethod<
   { writable: false }
 );
 // @ts-expect-error
-export const Modified = WrappedMethod<IContainer<any>, keyof any>(function (
-  this: IContainer<any>,
-  { func },
-  ...args
-) {
-  const result = (func as Function).apply(this, args);
-  modify.apply(this);
-  return result;
-});
+export const Modified = WrappedMethod<IContainer<unknown>, PropertyKey>(
+  function (this: IContainer<unknown>, { func }, ...args) {
+    const result = (func as Function).apply(this, args);
+    modify.apply(this);
+    return result;
+  }
+);
 const readonly$modifier = ReadonlyOutside<IContainer<unknown>>({
   enumerable: false,
   configurable: false,
@@ -50,6 +47,6 @@ const readonly$modifier = ReadonlyOutside<IContainer<unknown>>({
 export const iteration = {
   modifier: readonly$modifier.decorate<"$modified">(0),
 };
-export function modify(this: IContainer<any>) {
+export function modify(this: IContainer<unknown>) {
   readonly$modifier.set(this, "$modified", this.$modified + 1);
 }

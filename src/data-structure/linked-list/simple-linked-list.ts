@@ -17,7 +17,7 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
   @readonly.decorate<"size">(0)
   readonly size!: number;
   @ImmutableIteration
-  *[Symbol.iterator](this: SimpleLinkedList<T>): Iterator<T, any, undefined> {
+  *[Symbol.iterator](this: SimpleLinkedList<T>): Iterator<T, void, undefined> {
     let node = this.head;
     while (node) {
       yield node.value;

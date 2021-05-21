@@ -1,5 +1,5 @@
 import { noop } from "../functions/common";
-import { AnyArray } from "../types/common";
+import { AnyArray } from "../types/array";
 import { Func, Method } from "../types/concepts";
 
 export type Operation =

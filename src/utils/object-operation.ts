@@ -1,4 +1,4 @@
-import { WithoutKey } from "../types/converts";
+import { WithoutKey } from "../types/object";
 
 export type PropertyConfig = WithoutKey<
   PropertyDescriptor,
