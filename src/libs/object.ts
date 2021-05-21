@@ -1,4 +1,5 @@
-import { StringKey } from "../types/converts";
+import { AnyArray } from "../types/common";
+import { ArrayItem, StringKey, UnionToIntersection } from "../types/converts";
 
 type DefinedProperties<
   Descriptors extends Record<PropertyKey, TypedPropertyDescriptor<unknown>>
@@ -47,6 +48,11 @@ interface ITypedObject extends ObjectConstructor {
   ): { [K in keyof T]: TypedPropertyDescriptor<T[K]> };
 
   create<T extends object | null>(prototype: T): T extends null ? {} : T;
+
+  assign<T, Patchs extends AnyArray>(
+    source: T,
+    ...patch: Patchs
+  ): asserts source is T & UnionToIntersection<ArrayItem<Patchs>>;
 }
 // @ts-expect-error
 const TypedObject: ITypedObject = Object;
