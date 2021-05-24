@@ -25,6 +25,19 @@ export type AccessPaths<T> = T extends object
     }[keyof T]
   : [];
 
+export type AccessByPath<
+  T,
+  Path extends AccessPaths<T>
+> = Path extends EmptyTuple
+  ? T
+  : Path extends [infer Current, ...infer Rest]
+  ? Current extends keyof T
+    ? Rest extends AccessPaths<T[Current]>
+      ? AccessByPath<T[Current], Rest>
+      : never
+    : never
+  : never;
+
 export type StringAccessKeyOf<T> = T extends PrimitiveTypes
   ? never
   : `${Extract<keyof T, TemplateAllowedTypes>}`;
