@@ -1,6 +1,7 @@
 coverage
 build
 dev-build
+es-module
 node_modules
 *-docs
 **/playground.*
