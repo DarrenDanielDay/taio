@@ -2,7 +2,15 @@
   "name": "taio",
   "version": "0.2.1",
   "description": "Typescript All In One",
-  "main": "build/index.js",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "src",
+    "build",
+    "tsconfig.json",
+    "tsconfig.production.json",
+    ".prettierignore"
+  ],
   "license": "MIT",
   "author": {
     "email": "Darren_Daniel_Day@hotmail.com",
