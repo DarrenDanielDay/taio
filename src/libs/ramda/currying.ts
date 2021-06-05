@@ -1,10 +1,10 @@
 import { AnyArray, CutFirst, EmptyTuple, TupleSlices } from "../../types/array";
 import { AnyFunc, Func } from "../../types/concepts";
-import { isPlaceHolder, PlaceHolder, _$_ } from "./placeholder";
+import { isPlaceholder, Placeholder, _$_ } from "./placeholder";
 
 type PlaceHoldedParams<P extends AnyArray> = P extends EmptyTuple
   ? EmptyTuple
-  : [P[0] | PlaceHolder, ...PlaceHoldedParams<CutFirst<P>>];
+  : [P[0] | Placeholder, ...PlaceHoldedParams<CutFirst<P>>];
 type CurryingCall<
   P extends AnyArray,
   R,
@@ -15,11 +15,11 @@ type ApplyArgs<
   Args extends TupleSlices<PlaceHoldedParams<P>>
 > = Args extends EmptyTuple
   ? P
-  : Args[0] extends Exclude<P[0], PlaceHolder>
+  : Args[0] extends Exclude<P[0], Placeholder>
   ? // @ts-expect-error
     ApplyArgs<CutFirst<P>, CutFirst<Args>>
   : // @ts-expect-error
-    [Exclude<P[0], PlaceHolder>, ...ApplyArgs<CutFirst<P>, CutFirst<Args>>];
+    [Exclude<P[0], Placeholder>, ...ApplyArgs<CutFirst<P>, CutFirst<Args>>];
 
 interface Currying<P extends AnyArray, R> {
   <Args extends TupleSlices<PlaceHoldedParams<P>>>(...args: Args): CurryingCall<
@@ -34,7 +34,7 @@ function _currying(fn: AnyFunc, passed: unknown[]) {
     const newPassed = passed.slice();
     const toFill: number[] = [];
     for (let i = 0; i < passed.length; i++) {
-      if (isPlaceHolder(passed[i])) {
+      if (isPlaceholder(passed[i])) {
         toFill.push(i);
       }
     }
@@ -45,7 +45,7 @@ function _currying(fn: AnyFunc, passed: unknown[]) {
       }
       newPassed[index] = args[i];
     }
-    if (newPassed.every((param) => param !== _$_)) {
+    if (newPassed.every((param) => !isPlaceholder(param))) {
       return fn.apply(undefined, newPassed);
     } else {
       return _currying(fn, newPassed);
