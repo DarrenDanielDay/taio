@@ -93,6 +93,7 @@ export function Accesser<
         return handler.call(
           this,
           { func: originalAccessor, name: key, target },
+          // @ts-expect-error
           ...args
         );
       };

@@ -45,7 +45,7 @@ export class Property<This, Key extends keyof This> {
         writable: true,
       });
     } else {
-      Reflect.set((instance as unknown) as object, this.#symbol, value);
+      Reflect.set(instance as unknown as object, this.#symbol, value);
     }
   }
 }

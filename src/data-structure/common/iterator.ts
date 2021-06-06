@@ -5,20 +5,18 @@ import { IContainer } from "../interfaces/schema";
 
 export const ImmutableIteration = WrappedMethod<
   IContainer<unknown>,
-  // @ts-expect-error
   typeof Symbol.iterator
 >(
   function* ({
     func,
   }: MethodDecoratorContext<
     IContainer<unknown>,
-    // @ts-expect-error
     typeof Symbol.iterator
   >): Generator<unknown, void, undefined> {
     const lastModified = this.$modified;
-    const generator = (func as (
-      this: IContainer<unknown>
-    ) => Generator<unknown, void, undefined>).apply(this);
+    const generator = (
+      func as (this: IContainer<unknown>) => Generator<unknown, void, undefined>
+    ).apply(this);
     for (
       let iterator = generator.next();
       !iterator.done;

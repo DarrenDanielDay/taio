@@ -62,9 +62,8 @@ export type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
 export type SelectKey<Union extends string, K extends Union> = K;
 
-export type TakeFirst<
-  Str extends string
-> = Str extends `${infer First}${string}` ? First : EmptyString;
+export type TakeFirst<Str extends string> =
+  Str extends `${infer First}${string}` ? First : EmptyString;
 export type TakeRest<Str extends string> = Str extends `${string}${infer Rest}`
   ? Rest
   : EmptyString;

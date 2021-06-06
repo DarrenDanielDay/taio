@@ -20,7 +20,7 @@ type DefinedProperty<K extends PropertyKey, P> = {
   [Key in K]: P;
 };
 
-interface ITypedObject extends ObjectConstructor {
+interface ITypedObject {
   keys<T>(obj: T): StringKey<T>[];
 
   entries<T>(obj: T): { [K in StringKey<T>]: [K, T[K]] }[StringKey<T>][];
