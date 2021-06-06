@@ -7,7 +7,7 @@ export class DefaultMap<Key, Value> extends Map<Key, Value> {
     super(entries);
     this.#getDefault = getDefault;
   }
-  get(key: Key): Value {
+  override get(key: Key): Value {
     if (!this.has(key)) {
       this.set(key, this.#getDefault(key));
     }
