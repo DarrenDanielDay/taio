@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "build"
+    "module": "UMD",
+    "outDir": "umd"
   },
   "extends": "./tsconfig.prod.json"
 }

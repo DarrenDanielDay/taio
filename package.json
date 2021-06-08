@@ -7,7 +7,9 @@
   "files": [
     "src",
     "build",
-    "es-module",
+    "cjs",
+    "esm",
+    "umd",
     "tsconfig.json",
     "tsconfig.production.json",
     ".prettierignore"
@@ -22,7 +24,13 @@
     "url": "https://github.com/DarrenDanielDay/taio"
   },
   "scripts": {
-    "build": "tsc --project ./tsconfig.production.json && tsc --project ./tsconfig.prod.json",
+    "build:prod": "tsc --project ./tsconfig.production.json",
+    "build:amd": "tsc --project ./tsconfig.amd.prod.json",
+    "build:cjs": "tsc --project ./tsconfig.cjs.prod.json",
+    "build:esm": "tsc --project ./tsconfig.esm.prod.json",
+    "build:sys": "tsc --project ./tsconfig.sys.prod.json",
+    "build:umd": "tsc --project ./tsconfig.umd.prod.json",
+    "build": "concurrently yarn:build:*",
     "clean": "ts-node --files ./scripts/clean.ts",
     "compile": "tsc",
     "dev": "yarn watch",
@@ -41,6 +49,7 @@
     "@types/glob": "^7.1.3",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.1",
+    "concurrently": "^6.2.0",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
     "prettier": "^2.3.1",

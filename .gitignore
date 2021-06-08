@@ -2,7 +2,11 @@
 playground.*
 dev-build
 build
-es-module
+amd
+cjs
+esm
+sys
+umd
 ## TypeDoc generated
 *-docs
 

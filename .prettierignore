@@ -1,7 +1,11 @@
 coverage
 build
 dev-build
-es-module
+amd
+cjs
+esm
+sys
+umd
 node_modules
 *-docs
 **/playground.*

@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "AMD",
+    "isolatedModules": false,
+    "outFile": "amd/taio.amd.js"
+  },
+  "extends": "./tsconfig.prod.json"
+}

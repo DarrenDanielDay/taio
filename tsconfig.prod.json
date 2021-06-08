@@ -1,10 +1,4 @@
 {
-  "compilerOptions": {
-    "outDir": "es-module",
-    "target": "ESNext",
-    "module": "ES6",
-    "moduleResolution": "Node"
-  },
   "extends": "./tsconfig.json",
   "include": ["src"]
 }

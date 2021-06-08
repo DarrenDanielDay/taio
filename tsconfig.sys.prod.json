@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "build"
+    "module": "System",
+    "outDir": "sys"
   },
   "extends": "./tsconfig.prod.json"
 }
