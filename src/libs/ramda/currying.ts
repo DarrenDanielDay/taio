@@ -1,5 +1,10 @@
-import { AnyArray, CutFirst, EmptyTuple, TupleSlices } from "../../types/array";
-import { AnyFunc, Func } from "../../types/concepts";
+import type {
+  AnyArray,
+  CutFirst,
+  EmptyTuple,
+  TupleSlices,
+} from "../../types/array";
+import type { AnyFunc, Func } from "../../types/concepts";
 import { isPlaceholder, Placeholder, _$_ } from "./placeholder";
 
 type PlaceHoldedParams<P extends AnyArray> = P extends EmptyTuple

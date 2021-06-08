@@ -1,4 +1,4 @@
-import { Multiply } from "../../../types/number";
+import type { Multiply } from "../../../types/number";
 
 /**
  * Pure function `multiply`

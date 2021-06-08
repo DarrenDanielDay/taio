@@ -1,4 +1,4 @@
-import { Add } from "../../../types/number";
+import type { Add } from "../../../types/number";
 
 /**
  * Pure function `add`.

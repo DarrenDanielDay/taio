@@ -1,4 +1,4 @@
-import { AnyArray } from "./array";
+import type { AnyArray } from "./array";
 
 export type Func<Params extends AnyArray, Result> = (...args: Params) => Result;
 export type AnyFunc = Func<any[], any>;

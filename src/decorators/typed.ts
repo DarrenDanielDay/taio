@@ -1,4 +1,4 @@
-import { AnyMethod, Method, MethodKeys } from "../types/concepts";
+import type { AnyMethod, Method, MethodKeys } from "../types/concepts";
 
 export function parameter<
   This,

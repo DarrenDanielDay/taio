@@ -1,4 +1,4 @@
-import { WithoutKey } from "./object";
+import type { WithoutKey } from "./object";
 
 export type PrimitiveTypes =
   | string

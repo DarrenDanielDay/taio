@@ -1,6 +1,6 @@
-import { AnyArray, ArrayItem, EmptyTuple } from "./array";
-import { LiteralToPrimitive, PrimitiveTypes } from "./common";
-import { TemplateAllowedTypes } from "./string";
+import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
+import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
+import type { TemplateAllowedTypes } from "./string";
 export type WithoutKey<T, K extends keyof T> = Omit<T, K>;
 export type DeepReadonly<T> = T extends PrimitiveTypes
   ? T

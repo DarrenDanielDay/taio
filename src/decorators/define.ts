@@ -1,4 +1,4 @@
-import { Getter, Method, MethodKeys, Setter } from "../types/concepts";
+import type { Getter, Method, MethodKeys, Setter } from "../types/concepts";
 import {
   overwriteDescriptorConfig,
   PropertyConfig,

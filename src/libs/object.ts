@@ -1,5 +1,5 @@
-import { AnyArray, ArrayItem } from "../types/array";
-import { StringKey, UnionToIntersection } from "../types/converts";
+import type { AnyArray, ArrayItem } from "../types/array";
+import type { StringKey, UnionToIntersection } from "../types/converts";
 
 type DefinedProperties<
   Descriptors extends Record<PropertyKey, TypedPropertyDescriptor<unknown>>

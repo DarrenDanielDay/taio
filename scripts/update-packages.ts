@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import child_process from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as child_process from "child_process";
 const cwd = process.cwd();
 async function main() {
   console.log(cwd);

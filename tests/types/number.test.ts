@@ -1,4 +1,4 @@
-import { Add } from "../../src/types/number";
+import type { Add } from "../../src/types/number";
 
 describe("Number types", () => {
   it("should be constraint", () => {

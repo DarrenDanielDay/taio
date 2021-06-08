@@ -1,6 +1,6 @@
 import { noop } from "../functions/common";
-import { AnyArray } from "../types/array";
-import { Func, Method } from "../types/concepts";
+import type { AnyArray } from "../types/array";
+import type { Func, Method } from "../types/concepts";
 
 export type Operation =
   | ApplyOperation<any, any, any, any>

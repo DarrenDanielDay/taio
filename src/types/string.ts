@@ -1,4 +1,4 @@
-import { CutFirst } from "./array";
+import type { CutFirst } from "./array";
 
 export type EmptyString = "";
 export type Underline = "_";

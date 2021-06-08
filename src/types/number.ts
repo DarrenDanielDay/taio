@@ -1,5 +1,5 @@
-import { AnyArray, EmptyTuple } from "./array";
-import { Digit, EmptyString, ListChar } from "./string";
+import type { AnyArray, EmptyTuple } from "./array";
+import type { Digit, EmptyString, ListChar } from "./string";
 
 export type Add<A extends number, B extends number> = [
   ...ToCount<`${A}`>,
