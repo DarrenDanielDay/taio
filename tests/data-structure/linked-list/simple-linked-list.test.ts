@@ -121,9 +121,16 @@ describe("simple linked list", () => {
         list.addLast(number);
       }
     }).toThrow(/iteration/);
-    describe("error just occur in iteration", () => {
-      expect(list.size).toBe(2);
-    });
+  });
+  it("should just error in iteration", () => {
+    const list = new SimpleLinkedList<number>();
+    list.addLast(1);
+    expect(() => {
+      for (const number of list) {
+        list.addLast(number);
+      }
+    }).toThrow(/iteration/);
+    expect(list.size).toBe(2);
   });
   describe("empty linked list", () => {
     let list: SimpleLinkedList<number>;

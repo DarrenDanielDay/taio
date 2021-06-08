@@ -1,4 +1,4 @@
-import { MethodKeys } from "../types/concepts";
+import { AnyMethod, Method, MethodKeys } from "../types/concepts";
 
 export function parameter<
   This,
@@ -11,12 +11,19 @@ export function parameter<
   return decorator;
 }
 
+export type ExtractToMethod<
+  This,
+  Key extends MethodKeys<This>
+> = This[Key] extends AnyMethod
+  ? Method<This, Parameters<This[Key]>, ReturnType<This[Key]>>
+  : never;
+
 export function method<This, Key extends MethodKeys<This>>(
   decorator: (
     target: This,
     key: Key,
-    descriptor: TypedPropertyDescriptor<This[Key]>
-  ) => void | TypedPropertyDescriptor<This[Key]>
+    descriptor: TypedPropertyDescriptor<ExtractToMethod<This, Key>>
+  ) => void | TypedPropertyDescriptor<ExtractToMethod<This, Key>>
 ): MethodDecorator {
   // @ts-expect-error
   return decorator;

@@ -1,15 +1,9 @@
-import {
-  AnyMethod,
-  Getter,
-  Method,
-  MethodKeys,
-  Setter,
-} from "../types/concepts";
+import { Getter, Method, MethodKeys, Setter } from "../types/concepts";
 import {
   overwriteDescriptorConfig,
   PropertyConfig,
 } from "../utils/object-operation";
-import { method, property } from "./typed";
+import { ExtractToMethod, method, property } from "./typed";
 
 export function DefineProperty<T>(
   descriptor: TypedPropertyDescriptor<T>
@@ -19,10 +13,10 @@ export function DefineProperty<T>(
   });
 }
 
-export interface MethodDecoratorContext<This, Key extends keyof This> {
+export interface MethodDecoratorContext<This, Key extends MethodKeys<This>> {
   target: This;
   name: Key;
-  func: This[Key] extends AnyMethod ? This[Key] : never;
+  func: ExtractToMethod<This, Key>;
 }
 
 export function WrappedMethod<This, Key extends MethodKeys<This>>(

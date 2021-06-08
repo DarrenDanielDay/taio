@@ -14,9 +14,7 @@ export const ImmutableIteration = WrappedMethod<
     typeof Symbol.iterator
   >): Generator<unknown, void, undefined> {
     const lastModified = this.$modified;
-    const generator = (
-      func as (this: IContainer<unknown>) => Generator<unknown, void, undefined>
-    ).apply(this);
+    const generator = func.apply(this);
     for (
       let iterator = generator.next();
       !iterator.done;
