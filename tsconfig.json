@@ -32,7 +32,7 @@
     "isolatedModules": true,
     "jsx": "react",
     "keyofStringsOnly": false,
-    "lib": ["DOM", "ES2019", "ES2020.BigInt"],
+    "lib": ["ESNext"],
     "listEmittedFiles": false,
     "listFiles": false,
     "listFilesOnly": false,
