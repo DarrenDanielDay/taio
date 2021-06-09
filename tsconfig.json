@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "allowSyntheticDefaultImports": false,
     "allowUmdGlobalAccess": false,
     "allowUnreachableCode": false,
@@ -8,7 +8,6 @@
     "alwaysStrict": true,
     "assumeChangesOnlyAffectDirectDependencies": false,
     "charset": "utf8",
-    "checkJs": true,
     "composite": false,
     "declaration": true,
     "declarationMap": true,
