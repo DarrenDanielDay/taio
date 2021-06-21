@@ -24,13 +24,13 @@
     "url": "https://github.com/DarrenDanielDay/taio"
   },
   "scripts": {
+    "build": "concurrently yarn:build:*",
     "build:prod": "tsc --project ./tsconfig.production.json",
     "build:amd": "tsc --project ./tsconfig.amd.prod.json",
     "build:cjs": "tsc --project ./tsconfig.cjs.prod.json",
     "build:esm": "tsc --project ./tsconfig.esm.prod.json",
     "build:sys": "tsc --project ./tsconfig.sys.prod.json",
     "build:umd": "tsc --project ./tsconfig.umd.prod.json",
-    "build": "concurrently yarn:build:*",
     "clean": "ts-node --files ./scripts/clean.ts",
     "compile": "tsc",
     "dev": "yarn watch",
@@ -40,11 +40,11 @@
     "lint": "yarn lint:style && yarn lint:types",
     "lint:style": "prettier --check .",
     "lint:types": "tsc --noEmit",
+    "prepare": "husky install && yarn build",
     "reset": "yarn && yarn clean --git && yarn",
     "test": "jest",
     "update": "ts-node --files ./scripts/update-packages.ts",
-    "watch": "tsc -w",
-    "prepare": "husky install && yarn build"
+    "watch": "tsc -w"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
