@@ -7,6 +7,7 @@ cjs
 esm
 sys
 umd
+esbuild
 ## TypeDoc generated
 *-docs
 
