@@ -1,3 +1,4 @@
+import * as util from "util";
 import * as fs from "fs";
 import * as path from "path";
 import * as child_process from "child_process";
@@ -5,7 +6,9 @@ const cwd = process.cwd();
 async function main() {
   console.log(cwd);
   const packageJson = JSON.parse(
-    fs.readFileSync(path.resolve(cwd, "package.json")).toString("utf-8")
+    (
+      await util.promisify(fs.readFile)(path.resolve(cwd, "package.json"))
+    ).toString("utf-8")
   ) as {
     dependencies: { [key: string]: string };
     devDependencies: { [key: string]: string };
@@ -14,25 +17,14 @@ async function main() {
   const devDependencies = Object.keys(packageJson.devDependencies ?? {});
   const ds = dependencies.join(" ");
   const devs = devDependencies.join(" ");
-  return new Promise<void>((resolve, reject) => {
-    const remove = `yarn remove ${ds} ${devs}`;
-    const install = `${ds.length ? `yarn add ${ds}\n` : ""}${
-      devs.length ? `yarn add -D ${devs}` : ""
-    }`;
-    child_process.exec(remove, { cwd }, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        child_process.exec(install, { cwd }, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      }
-    });
-  });
+  const exec = util.promisify(child_process.exec);
+  const remove = `yarn remove ${ds} ${devs}`;
+  const addDep = ds.length ? `yarn add ${ds}\n` : "";
+  const addDevDep = devs.length ? `yarn add -D ${devs}` : "";
+  const config: child_process.ExecOptions = { cwd };
+  await exec(remove, config);
+  await exec(addDevDep, config);
+  await exec(addDep, config);
 }
 
 main()
