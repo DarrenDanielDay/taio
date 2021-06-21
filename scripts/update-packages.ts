@@ -18,13 +18,13 @@ async function main() {
   const ds = dependencies.join(" ");
   const devs = devDependencies.join(" ");
   const exec = util.promisify(child_process.exec);
-  const remove = `yarn remove ${ds} ${devs}`;
-  const addDep = ds.length ? `yarn add ${ds}\n` : "";
-  const addDevDep = devs.length ? `yarn add -D ${devs}` : "";
+  const remove = (ds || devs) && `yarn remove ${ds} ${devs}`;
+  const addDep = ds ? `yarn add ${ds}\n` : "";
+  const addDevDep = devs ? `yarn add -D ${devs}` : "";
   const config: child_process.ExecOptions = { cwd };
-  await exec(remove, config);
-  await exec(addDevDep, config);
-  await exec(addDep, config);
+  remove && (await exec(remove, config));
+  addDevDep && (await exec(addDevDep, config));
+  addDep && (await exec(addDep, config));
 }
 
 main()
