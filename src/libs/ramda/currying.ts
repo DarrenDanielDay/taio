@@ -20,11 +20,11 @@ type ApplyArgs<
   Args extends TupleSlices<PlaceHoldedParams<P>>
 > = Args extends EmptyTuple
   ? P
-  : Args[0] extends Exclude<P[0], Placeholder>
-  ? // @ts-expect-error
-    ApplyArgs<CutFirst<P>, CutFirst<Args>>
-  : // @ts-expect-error
-    [Exclude<P[0], Placeholder>, ...ApplyArgs<CutFirst<P>, CutFirst<Args>>];
+  : CutFirst<Args> extends TupleSlices<PlaceHoldedParams<CutFirst<P>>>
+  ? Args[0] extends Exclude<P[0], Placeholder>
+    ? ApplyArgs<CutFirst<P>, CutFirst<Args>>
+    : [Exclude<P[0], Placeholder>, ...ApplyArgs<CutFirst<P>, CutFirst<Args>>]
+  : never;
 
 interface Currying<P extends AnyArray, R> {
   <Args extends TupleSlices<PlaceHoldedParams<P>>>(...args: Args): CurryingCall<
