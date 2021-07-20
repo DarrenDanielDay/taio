@@ -20,40 +20,43 @@ type DefinedProperty<K extends PropertyKey, P> = {
   [Key in K]: P;
 };
 
-interface ITypedObject {
+/** @internal */
+export interface ITypedObject {
   keys<T>(obj: T): StringKey<T>[];
 
   entries<T>(obj: T): { [K in StringKey<T>]: [K, T[K]] }[StringKey<T>][];
 
   values<T>(obj: T): { [K in StringKey<T>]: T[K] }[StringKey<T>][];
 
-  defineProperty<T, K extends PropertyKey, P>(
+  defineProperty<T extends object, K extends PropertyKey, P>(
     obj: T,
     key: K,
     descriptor: TypedPropertyDescriptor<P>
   ): asserts obj is T & DefinedProperty<K, P>;
 
-  defineProperties<T, Descriptors extends PropertyDescriptors>(
+  defineProperties<T extends object, Descriptors extends PropertyDescriptors>(
     obj: T,
     descriptors: Descriptors
   ): asserts obj is T & DefinedProperties<Descriptors>;
 
-  getOwnPropertyDescriptor<T, K extends keyof T>(
+  getOwnPropertyDescriptor<T extends object, K extends keyof T>(
     obj: T,
     key: K
-  ): TypedPropertyDescriptor<T[K]>;
+  ): TypedPropertyDescriptor<T[K]> | undefined;
 
-  getOwnPropertyDescriptors<T>(
+  getOwnPropertyDescriptors<T extends object>(
     obj: T
-  ): { [K in keyof T]: TypedPropertyDescriptor<T[K]> };
+  ): { [K in keyof T]?: TypedPropertyDescriptor<T[K]> };
+
+  getPrototypeOf<T>(target: T): T | null;
 
   create<T extends object | null>(prototype: T): T extends null ? {} : T;
 
-  assign<T, Patchs extends AnyArray>(
+  assign<T, Patches extends AnyArray>(
     source: T,
-    ...patch: Patchs
-  ): asserts source is T & UnionToIntersection<ArrayItem<Patchs>>;
+    ...patch: Patches
+  ): asserts source is T & UnionToIntersection<ArrayItem<Patches>>;
 }
-// @ts-expect-error
+
 const TypedObject: ITypedObject = Object;
 export { TypedObject };

@@ -1,4 +1,5 @@
 export type AnyArray = readonly unknown[];
+export type AnyParams = any[];
 export type EmptyTuple = readonly [];
 export type ArrayItem<Arr extends AnyArray> = Arr extends readonly (infer T)[]
   ? T

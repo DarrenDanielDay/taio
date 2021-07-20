@@ -1,7 +1,7 @@
-import type { AnyArray } from "./array";
+import type { AnyArray, AnyParams } from "./array";
 
 export type Func<Params extends AnyArray, Result> = (...args: Params) => Result;
-export type AnyFunc = Func<any[], any>;
+export type AnyFunc = Func<AnyParams, any>;
 export type TypeGuard<Union, SubSet extends Union> = (
   obj: Union
 ) => obj is SubSet;
@@ -11,7 +11,7 @@ export type Method<This, Params extends AnyArray, Result> = (
   this: This,
   ...args: Params
 ) => Result;
-export type AnyMethod = Method<any, any[], any>;
+export type AnyMethod = Method<any, AnyParams, any>;
 export type Getter<This, T> = Method<This, [], T>;
 export type Setter<This, T> = Method<This, [T], void>;
 export type MethodKeys<This> = {
