@@ -1,6 +1,8 @@
 import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
 import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
 import type { TemplateAllowedTypes } from "./string";
+export type EmptyObject = {};
+export type AnyPrototype = object | null;
 export type WithoutKey<T, K extends keyof T> = Omit<T, K>;
 export type DeepReadonly<T> = T extends PrimitiveTypes
   ? T
@@ -49,3 +51,11 @@ export type StringAccessPaths<T> = T extends object
         | [K, ...StringAccessPaths<T[K]>];
     }[StringAccessKeyOf<T> & keyof T]
   : [];
+type NonExtensibleMixin = {
+  readonly [key: string]: never;
+  readonly [index: number]: never;
+};
+
+export type NonExtensibleObject<T> = T & NonExtensibleMixin;
+export type SealedObject<T> = NonExtensibleObject<T>;
+export type FrozenObject<T> = Readonly<T> & NonExtensibleMixin;

@@ -1,5 +1,6 @@
 import type { AnyArray } from "../types/array";
 import type { AnyFunc, AnyMethod, ConstructorOf } from "../types/concepts";
+import type { NonExtensibleObject } from "../types/object";
 import type { ITypedObject } from "./object";
 
 interface ITypedReflect {
@@ -29,13 +30,18 @@ interface ITypedReflect {
     target: T,
     key: K
   ): T extends { [Key in K]?: unknown } ? boolean : false;
+  isExtensible(target: object): boolean;
   ownKeys<T extends object>(target: T): (keyof T)[];
+  preventExtensions<T extends object>(
+    target: T
+  ): asserts target is NonExtensibleObject<T>;
   set<T extends object, K extends keyof T>(
     target: T,
     key: K,
     value: T[K],
     reciever?: T
   ): boolean;
+  setPrototypeOf: ITypedObject["setPrototypeOf"];
 }
 
 // @ts-expect-error

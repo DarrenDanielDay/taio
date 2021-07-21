@@ -1,7 +1,9 @@
+import type { Func } from "../../types/concepts";
+
 export class DefaultMap<Key, Value> extends Map<Key, Value> {
-  #getDefault;
+  #getDefault: Func<[Key], Value>;
   constructor(
-    getDefault: (key: Key) => Value,
+    getDefault: Func<[Key], Value>,
     entries?: readonly (readonly [Key, Value])[] | null
   ) {
     super(entries);

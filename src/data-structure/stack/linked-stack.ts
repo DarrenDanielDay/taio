@@ -1,9 +1,10 @@
-import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
+import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import type { IStack } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
 const readonly = ReadonlyOutside<LinkedStack<unknown>>({ enumerable: true });
+@Freeze
 @Sealed
 class LinkedStack<T> implements IStack<T> {
   #linkedList = new SimpleLinkedList<T>();
@@ -39,7 +40,5 @@ class LinkedStack<T> implements IStack<T> {
     return this.#linkedList.head!.value;
   }
 }
-Object.freeze(LinkedStack);
-Object.freeze(LinkedStack.prototype);
 
 export { LinkedStack };

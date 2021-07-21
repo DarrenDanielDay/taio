@@ -21,4 +21,18 @@ describe("typed object", () => {
       })
     ).toEqual({ a: 1, bbb: "b", yyy: 555 });
   });
+
+  it("should have constraints", () => {
+    const obj = TypedObject.fromEntries([["a", 1]] as const);
+    expect(obj.a).toBe(1);
+    expect(obj).toEqual({ a: 1 });
+    const obj2 = TypedObject.fromEntries([
+      ["a", 1],
+      ["b", 2],
+    ] as const);
+    // @ts-expect-error
+    if (obj2.b === 3) {
+      fail("impossible");
+    }
+  });
 });

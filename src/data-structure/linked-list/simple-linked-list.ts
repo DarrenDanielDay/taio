@@ -1,4 +1,4 @@
-import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
+import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import type { ILinkedList, ILinkedNode } from "../interfaces/schema";
@@ -6,6 +6,8 @@ import type { ILinkedList, ILinkedNode } from "../interfaces/schema";
 const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
   enumerable: true,
 });
+
+@Freeze
 @Sealed
 class SimpleLinkedList<T> implements ILinkedList<T> {
   @iteration.modifier
@@ -151,7 +153,5 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
     return undefined;
   }
 }
-Object.freeze(SimpleLinkedList);
-Object.freeze(SimpleLinkedList.prototype);
 
 export { SimpleLinkedList };

@@ -20,6 +20,10 @@ export const Sealed = cls<Function>((classObject) => {
   return proxy;
 });
 
+export const Freeze = cls<Function>((classObject) => {
+  Object.freeze(classObject);
+  Object.freeze(classObject.prototype);
+});
 export class Property<This, Key extends keyof This> {
   #symbol = Symbol();
   #initValue;

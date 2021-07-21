@@ -1,11 +1,11 @@
-import { ReadonlyOutside, Sealed } from "../../decorators/limitations";
+import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { iteration, Modified } from "../common/iterator";
 import type { IQueue } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
 
 const readonly = ReadonlyOutside<LinkedQueue<unknown>>({ enumerable: true });
-
+@Freeze
 @Sealed
 class LinkedQueue<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
@@ -46,6 +46,5 @@ class LinkedQueue<T> implements IQueue<T> {
     return this.#linkedList.tail!.value;
   }
 }
-Object.freeze(LinkedQueue);
-Object.freeze(LinkedQueue.prototype);
+
 export { LinkedQueue };
