@@ -152,6 +152,19 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
     }
     return undefined;
   }
+  @Modified
+  clear() {
+    readonly.set(this, "head", undefined);
+    readonly.set(this, "tail", undefined);
+    readonly.set(this, "size", 0);
+  }
+  clone() {
+    const newList = new SimpleLinkedList<T>();
+    for (const value of this) {
+      newList.addLast(value);
+    }
+    return newList;
+  }
 }
 
 export { SimpleLinkedList };
