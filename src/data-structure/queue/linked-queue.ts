@@ -10,9 +10,9 @@ const readonly = ReadonlyOutside<LinkedQueue<unknown>>({ enumerable: true });
 class LinkedQueue<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
   @iteration.modifier
-  $modified!: number;
+  readonly $modified!: number;
   @readonly.decorate<"size">(0)
-  size!: number;
+  readonly size!: number;
   *[Symbol.iterator](): Iterator<T, void, undefined> {
     yield* this.#linkedList;
   }
