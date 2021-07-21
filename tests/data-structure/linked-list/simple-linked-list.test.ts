@@ -1,18 +1,17 @@
 import { SimpleLinkedList } from "../../../src/data-structure/linked-list/simple-linked-list";
 
-test("simple linked list immutable outside", () => {
-  const list = new SimpleLinkedList<number>();
-  // @ts-expect-error
-  expect(() => (list.size = 1)).toThrow(/readonly/);
-  // @ts-expect-error
-  expect(() => (list.head = 1)).toThrow(/readonly/);
-  // @ts-expect-error
-  expect(() => (list.tail = 1)).toThrow(/readonly/);
-  // @ts-expect-error
-  expect(() => (list.$modified = 1)).toThrow(/readonly/);
-});
-
 describe("simple linked list", () => {
+  it("should be immutable outside", () => {
+    const list = new SimpleLinkedList<number>();
+    // @ts-expect-error
+    expect(() => (list.size = 1)).toThrow(/readonly/);
+    // @ts-expect-error
+    expect(() => (list.head = 1)).toThrow(/readonly/);
+    // @ts-expect-error
+    expect(() => (list.tail = 1)).toThrow(/readonly/);
+    // @ts-expect-error
+    expect(() => (list.$modified = 1)).toThrow(/readonly/);
+  });
   it("add before logic", () => {
     const list = new SimpleLinkedList<number>();
     list.addFirst(1);
