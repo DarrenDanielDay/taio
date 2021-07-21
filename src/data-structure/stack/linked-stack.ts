@@ -39,6 +39,17 @@ class LinkedStack<T> implements IStack<T> {
     }
     return this.#linkedList.head!.value;
   }
+  @Modified
+  clear() {
+    this.#linkedList.clear();
+    readonly.set(this, "size", 0);
+  }
+
+  clone() {
+    const newStack = new LinkedStack<T>();
+    newStack.#linkedList = this.#linkedList.clone();
+    return newStack;
+  }
 }
 
 export { LinkedStack };

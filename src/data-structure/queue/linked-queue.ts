@@ -45,6 +45,17 @@ class LinkedQueue<T> implements IQueue<T> {
     }
     return this.#linkedList.tail!.value;
   }
+  @Modified
+  clear() {
+    this.#linkedList.clear();
+    readonly.set(this, "size", 0);
+  }
+
+  clone() {
+    const newQueue = new LinkedQueue<T>();
+    newQueue.#linkedList = this.#linkedList.clone();
+    return newQueue;
+  }
 }
 
 export { LinkedQueue };
