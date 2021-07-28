@@ -1,26 +1,23 @@
-import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
+import { Freeze, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { iteration, Modified } from "../common/iterator";
 import type { IQueue } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
-
-const readonly = ReadonlyOutside<LinkedQueue<unknown>>({ enumerable: true });
 @Freeze
 @Sealed
 class LinkedQueue<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
   @iteration.modifier
   readonly $modified!: number;
-  @readonly.decorate<"size">(0)
-  readonly size!: number;
+  get size(): number {
+    return this.#linkedList.size;
+  }
   *[Symbol.iterator](): Iterator<T, void, undefined> {
     yield* this.#linkedList;
   }
   @Modified
   enqueue(value: T): void {
-    const currentSize = this.size;
     this.#linkedList.addLast(value);
-    readonly.set(this, "size", currentSize + 1);
   }
   @Modified
   dequeue(): T {
@@ -30,7 +27,6 @@ class LinkedQueue<T> implements IQueue<T> {
     }
     const { value } = this.#linkedList.head!;
     this.#linkedList.removeFirst();
-    readonly.set(this, "size", currentSize - 1);
     return value;
   }
   get front(): T {
@@ -41,14 +37,13 @@ class LinkedQueue<T> implements IQueue<T> {
   }
   get back(): T {
     if (this.size === 0) {
-      return invalidOperation("Stack is empty.");
+      return invalidOperation("Queue is empty.");
     }
     return this.#linkedList.tail!.value;
   }
   @Modified
   clear() {
     this.#linkedList.clear();
-    readonly.set(this, "size", 0);
   }
 
   clone() {

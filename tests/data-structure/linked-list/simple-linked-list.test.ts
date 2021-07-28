@@ -131,19 +131,41 @@ describe("simple linked list", () => {
     }).toThrow(/iteration/);
     expect(list.size).toBe(2);
   });
+  it("should be empty when call clear()", () => {
+    const list = new SimpleLinkedList<number>();
+    list.addFirst(1);
+    list.addFirst(2);
+    list.addFirst(3);
+    list.addFirst(4);
+    list.addFirst(5);
+    expect(list.size).toBe(5);
+    list.clear();
+    expect(list.size).toBe(0);
+  });
+  it("should clone correctly when call clone()", () => {
+    const list = new SimpleLinkedList<object>();
+    list.addFirst({});
+    list.addFirst({});
+    list.addFirst({});
+    const copy = list.clone();
+    expect([...copy]).toEqual([...list]);
+    expect(copy.head?.value).toBe(list.head?.value);
+    expect(copy.head?.next?.value).toBe(list.head?.next?.value);
+    expect(copy.head?.next?.next?.value).toBe(list.head?.next?.next?.value);
+  });
   describe("empty linked list", () => {
     let list: SimpleLinkedList<number>;
     beforeEach(() => {
       list = new SimpleLinkedList();
     });
     it("should throw when call remove", () => {
-      expect(() => list.remove(list.head!)).toThrow(/empty/);
+      expect(() => list.remove(list.head!)).toThrow(/LinkedList.*empty/);
     });
     it("should throw when call remove", () => {
-      expect(() => list.removeFirst()).toThrow(/empty/);
+      expect(() => list.removeFirst()).toThrow(/LinkedList.*empty/);
     });
     it("should throw when call remove", () => {
-      expect(() => list.removeLast()).toThrow(/empty/);
+      expect(() => list.removeLast()).toThrow(/LinkedList.*empty/);
     });
   });
 });

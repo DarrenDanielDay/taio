@@ -70,10 +70,10 @@ describe("linked stack", () => {
     it("throws when call pop", () => {
       expect(() => {
         new LinkedStack<number>().pop();
-      }).toThrow(/empty/);
+      }).toThrow(/Stack.*empty/);
     });
     it("throws when read top", () => {
-      expect(() => new LinkedStack<number>().top).toThrow(/empty/);
+      expect(() => new LinkedStack<number>().top).toThrow(/Stack.*empty/);
     });
   });
 });
