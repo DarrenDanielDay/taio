@@ -66,6 +66,29 @@ describe("linked stack", () => {
       }
     }).toThrow(/iteration/);
   });
+  it("should be cleared when call clear()", () => {
+    const stack = new LinkedStack<number>();
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    stack.push(4);
+    expect(stack.size).toBe(4);
+    stack.clear();
+    expect(stack.size).toBe(0);
+  });
+  it("should clone the stack when call clone()", () => {
+    const stack = new LinkedStack<number>();
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    stack.push(4);
+    const cloned = stack.clone();
+    expect(cloned).not.toBe(stack);
+    expect(cloned.pop()).toBe(stack.pop());
+    expect(cloned.pop()).toBe(stack.pop());
+    expect(cloned.pop()).toBe(stack.pop());
+    expect(cloned.pop()).toBe(stack.pop());
+  });
   describe("empty stack", () => {
     it("throws when call pop", () => {
       expect(() => {

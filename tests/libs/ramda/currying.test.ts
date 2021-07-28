@@ -32,4 +32,10 @@ describe("Currying", () => {
       )(1, "2").toString()
     ).toBe(NaN.toString());
   });
+  it("should break when have redundant parameters", () => {
+    const fn = (a: number, b: string) => a + b;
+    // @ts-expect-error
+    const params: Parameters<typeof fn> = [1, "2", 3];
+    expect(currying(fn, 2)(...params)).toBe("12");
+  });
 });
