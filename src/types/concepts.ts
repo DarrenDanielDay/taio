@@ -22,6 +22,7 @@ export type PropertyKeys<T> = {
 }[keyof T];
 export type PropertyPart<T> = Pick<T, PropertyKeys<T>>;
 export type MethodPart<T> = Pick<T, MethodKeys<T>>;
-export type ConstructorOf<T, Params extends AnyArray = AnyArray> = {
+export type ConstructorOf<T, Params extends AnyParams> = {
   new (...args: Params): T;
 };
+export type AnyConstructor = ConstructorOf<unknown, AnyParams>;

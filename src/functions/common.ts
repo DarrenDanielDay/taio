@@ -7,3 +7,11 @@ export function noop() {
    * Do nothing.
    */
 }
+
+export function createNoop() {
+  return function noop() {
+    /**
+     * Do nothing.
+     */
+  };
+}

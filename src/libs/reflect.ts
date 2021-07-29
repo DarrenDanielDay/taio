@@ -1,5 +1,4 @@
-import type { AnyArray } from "../types/array";
-import type { AnyFunc, AnyMethod, ConstructorOf } from "../types/concepts";
+import type { AnyConstructor, AnyFunc, AnyMethod } from "../types/concepts";
 import type { NonExtensibleObject } from "../types/object";
 import type { ITypedObject } from "./object";
 
@@ -9,7 +8,7 @@ interface ITypedReflect {
     thisArgument: ThisParameterType<Fn>,
     argumentsList: Parameters<Fn>
   ): ReturnType<Fn>;
-  construct<Ctor extends ConstructorOf<unknown, AnyArray>>(
+  construct<Ctor extends AnyConstructor>(
     target: Ctor,
     argumentsList: ConstructorParameters<Ctor>,
     newTarget?: InstanceType<Ctor>

@@ -1,5 +1,5 @@
-import { noop } from "../functions/common";
-import type { AnyArray } from "../types/array";
+import { createNoop } from "../functions/common";
+import type { AnyParams } from "../types/array";
 import type { Func, Method } from "../types/concepts";
 
 export type Operation =
@@ -25,7 +25,7 @@ interface BaseOperation<T> {
 export interface ApplyOperation<
   T extends Func<Args, R> | Method<This, Args, R>,
   This,
-  Args extends AnyArray,
+  Args extends AnyParams,
   R
 > extends BaseOperation<T> {
   type: "apply";
@@ -35,8 +35,8 @@ export interface ApplyOperation<
 }
 
 export interface ConstructOperation<
-  T extends { new (...args: AnyArray): R },
-  Args extends AnyArray,
+  T extends { new (...args: AnyParams): R },
+  Args extends AnyParams,
   R
 > extends BaseOperation<T> {
   type: "construct";
@@ -197,7 +197,7 @@ export function createExpressionAnalyser(
 ): ProxyHandler<object> {
   let wrapped: Function | undefined;
   const wrapResultWithProxy = () => {
-    wrapped = wrapped ?? new Proxy(noop, proxyHandler);
+    wrapped = wrapped ?? new Proxy(createNoop(), proxyHandler);
     return wrapped;
   };
   const pureHandler = createPureTrackerProxyHandler(tracks);
@@ -262,6 +262,6 @@ export function createExpressionAnalyser(
 export function trackExpression<T, R>(expression: (input: T) => R) {
   const track: Operation[] = [];
   const handler = createExpressionAnalyser(track);
-  Reflect.apply(expression, undefined, [new Proxy(noop, handler)]);
+  Reflect.apply(expression, undefined, [new Proxy(createNoop(), handler)]);
   return track;
 }
