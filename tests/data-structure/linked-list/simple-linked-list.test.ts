@@ -3,13 +3,13 @@ import { SimpleLinkedList } from "../../../src/data-structure/linked-list/simple
 describe("simple linked list", () => {
   it("should be immutable outside", () => {
     const list = new SimpleLinkedList<number>();
-    // @ts-expect-error
+    // @ts-expect-error Directive as type check
     expect(() => (list.size = 1)).toThrow(/readonly/);
-    // @ts-expect-error
+    // @ts-expect-error Directive as type check
     expect(() => (list.head = 1)).toThrow(/readonly/);
-    // @ts-expect-error
+    // @ts-expect-error Directive as type check
     expect(() => (list.tail = 1)).toThrow(/readonly/);
-    // @ts-expect-error
+    // @ts-expect-error Directive as type check
     expect(() => (list.$modified = 1)).toThrow(/readonly/);
   });
   it("add before logic", () => {

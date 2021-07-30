@@ -1,4 +1,4 @@
-export type StandardEnum<T> = {
+export interface StandardEnum<T> {
   [name: string]: T | string;
   [id: number]: string;
-};
+}

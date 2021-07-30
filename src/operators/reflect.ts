@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createNoop } from "../functions/common";
 import type { AnyParams } from "../types/array";
-import type { Func, Method } from "../types/concepts";
+import type { AnyFunc, Func, Method } from "../types/concepts";
 
 export type Operation =
   | ApplyOperation<any, any, any, any>
@@ -35,7 +37,7 @@ export interface ApplyOperation<
 }
 
 export interface ConstructOperation<
-  T extends { new (...args: AnyParams): R },
+  T extends new (...args: AnyParams) => R,
   Args extends AnyParams,
   R
 > extends BaseOperation<T> {
@@ -115,7 +117,7 @@ export interface SetPrototypeOfOperation<T, P> extends BaseOperation<T> {
 }
 
 export function createPureTrackerProxyHandler<T>(tracks: Operation[]) {
-  const proxyHandler: ProxyHandler<Function> = {
+  const proxyHandler: Required<ProxyHandler<AnyFunc>> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
       tracks.push({
@@ -188,20 +190,20 @@ export function createPureTrackerProxyHandler<T>(tracks: Operation[]) {
       return result;
     },
   };
-  // @ts-expect-error
+  // @ts-expect-error Proxy force cast
   return proxyHandler as Required<ProxyHandler<T>>;
 }
 
 export function createExpressionAnalyser(
   tracks: Operation[]
 ): ProxyHandler<object> {
-  let wrapped: Function | undefined;
+  let wrapped: AnyFunc | undefined;
   const wrapResultWithProxy = () => {
-    wrapped = wrapped ?? new Proxy(createNoop(), proxyHandler);
+    wrapped = wrapped ?? new Proxy<AnyFunc>(createNoop(), proxyHandler);
     return wrapped;
   };
   const pureHandler = createPureTrackerProxyHandler(tracks);
-  const proxyHandler: ProxyHandler<Function> = {
+  const proxyHandler: ProxyHandler<AnyFunc> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
       tracks.push({

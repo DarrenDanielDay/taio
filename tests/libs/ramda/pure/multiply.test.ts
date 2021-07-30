@@ -9,8 +9,8 @@ describe("Multiply pure function", () => {
 
   it("should have constraint", () => {
     let nine = multiply(3, 3);
-    // @ts-expect-error
-    !!nine && (nine = 0);
+    // @ts-expect-error Directive as type check
+    nine = 0;
     nine = multiply(3, 3);
     expect(nine).toBe(9);
   });

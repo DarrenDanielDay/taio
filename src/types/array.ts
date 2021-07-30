@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyArray = readonly unknown[];
 export type AnyParams = any[];
 export type EmptyTuple = readonly [];

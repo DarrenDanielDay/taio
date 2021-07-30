@@ -1,9 +1,8 @@
 import type { Getter, Method, MethodKeys, Setter } from "../types/concepts";
-import {
-  overwriteDescriptorConfig,
-  PropertyConfig,
-} from "../utils/object-operation";
-import { ExtractToMethod, method, property } from "./typed";
+import type { PropertyConfig } from "../utils/object-operation";
+import { overwriteDescriptorConfig } from "../utils/object-operation";
+import type { ExtractToMethod } from "./typed";
+import { method, property } from "./typed";
 
 export function DefineProperty<T>(
   descriptor: TypedPropertyDescriptor<T>
@@ -29,7 +28,7 @@ export function WrappedMethod<This, Key extends MethodKeys<This>>(
 ): MethodDecorator {
   return method<This, Key>((target, methodName, descriptor) => {
     const originalMethod = descriptor.value;
-    // @ts-expect-error
+    // @ts-expect-error Conditional type
     descriptor.value = function (this: This, ...args: Parameters<This[Key]>) {
       return wrapper.apply(this, [
         { name: methodName, target, func: originalMethod! },
@@ -73,13 +72,13 @@ export function Accesser<
   overwrite?: PropertyConfig
 ): MethodDecorator {
   return method(
-    // @ts-expect-error
+    // @ts-expect-error Contravariance
     (target: This, key: Key, describer: TypedPropertyDescriptor<This[Key]>) => {
       const originalAccessor = describer[type] as Accessors<
         This,
         This[Key]
       >[Type];
-      // @ts-expect-error
+      // @ts-expect-error Index type inferred as union type
       describer[type] = function (
         this: This,
         ...args: Parameters<Accessors<This, This[Key]>[Type]>
@@ -87,7 +86,7 @@ export function Accesser<
         return handler.call(
           this,
           { func: originalAccessor, name: key, target },
-          // @ts-expect-error
+          // @ts-expect-error Index type inferred as union type
           ...args
         );
       };

@@ -35,7 +35,7 @@ type ConstructFromEntries<
   ? F extends readonly [infer K, infer V]
     ? R extends readonly (readonly [PropertyKey, unknown])[]
       ? K extends PropertyKey
-        ? DefinedProperty<K, V> & ConstructFromEntries<R>
+        ? ConstructFromEntries<R> & DefinedProperty<K, V>
         : never
       : never
     : never
@@ -55,16 +55,16 @@ export interface ITypedObject {
   create<T extends object | null, Descriptors extends PropertyDescriptors>(
     prototype: T,
     descriptors: Descriptors
-  ): (T extends null ? {} : T) & DefinedProperties<Descriptors>;
+  ): DefinedProperties<Descriptors> & (T extends null ? EmptyObject : T);
   defineProperty<T extends object, K extends PropertyKey, P>(
     obj: T,
     key: K,
     descriptor: TypedPropertyDescriptor<P>
-  ): asserts obj is T & DefinedProperty<K, P>;
+  ): asserts obj is DefinedProperty<K, P> & T;
   defineProperties<T extends object, Descriptors extends PropertyDescriptors>(
     obj: T,
     descriptors: Descriptors
-  ): asserts obj is T & DefinedProperties<Descriptors>;
+  ): asserts obj is DefinedProperties<Descriptors> & T;
   seal<T>(target: T): asserts target is SealedObject<T>;
   freeze<T>(target: T): asserts target is FrozenObject<T>;
   preventExtensions<T>(target: T): asserts target is NonExtensibleObject<T>;
@@ -90,6 +90,6 @@ export interface ITypedObject {
   ): asserts obj is T & (Prototype extends null ? unknown : Prototype);
 }
 
-// @ts-expect-error
+// @ts-expect-error Type overwrite
 const TypedObject: ITypedObject = Object;
 export { TypedObject };

@@ -3,7 +3,7 @@ import type { NonExtensibleObject } from "../types/object";
 import type { ITypedObject } from "./object";
 
 interface ITypedReflect {
-  apply<Fn extends AnyMethod | AnyFunc>(
+  apply<Fn extends AnyFunc | AnyMethod>(
     target: Fn,
     thisArgument: ThisParameterType<Fn>,
     argumentsList: Parameters<Fn>
@@ -43,6 +43,6 @@ interface ITypedReflect {
   setPrototypeOf: ITypedObject["setPrototypeOf"];
 }
 
-// @ts-expect-error
+// @ts-expect-error Type overwrite
 const TypedReflect: ITypedReflect = Reflect;
 export { TypedReflect };

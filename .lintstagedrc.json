@@ -1,0 +1,4 @@
+{
+  "src/**/*.ts": "yarn eslint --fix",
+  "tests/**/*.ts": "yarn eslint --fix"
+}

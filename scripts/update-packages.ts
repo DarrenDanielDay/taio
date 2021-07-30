@@ -10,8 +10,8 @@ async function main() {
       await util.promisify(fs.readFile)(path.resolve(cwd, "package.json"))
     ).toString("utf-8")
   ) as {
-    dependencies: { [key: string]: string };
-    devDependencies: { [key: string]: string };
+    dependencies: Record<string, string> | undefined;
+    devDependencies: Record<string, string> | undefined;
   };
   const dependencies = Object.keys(packageJson.dependencies ?? {});
   const devDependencies = Object.keys(packageJson.devDependencies ?? {});

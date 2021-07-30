@@ -8,7 +8,7 @@ async function main() {
   await generateIndex(srcFolder);
 }
 
-function PascalCase(kebabCase: string): string {
+function toPascalCase(kebabCase: string): string {
   return kebabCase
     .split("-")
     .map((word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
@@ -23,7 +23,7 @@ async function generateIndex(folder: string) {
       .filter((dir) => !dir.endsWith(index))
       .map((dir) => {
         const submoduleName = dir.replace(suffix, "");
-        return `export * as ${PascalCase(
+        return `export * as ${toPascalCase(
           submoduleName
         )} from "./${submoduleName}"`;
       })

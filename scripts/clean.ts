@@ -1,5 +1,5 @@
 import * as child_process from "child_process";
-const fs: typeof import("fs/promises") = require("fs").promises;
+import * as fs from "fs/promises";
 import * as path from "path";
 const folders = ["./build", "./dev-build", "./node_modules", "./coverage"];
 const args = process.argv;

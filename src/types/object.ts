@@ -1,6 +1,7 @@
 import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
 import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
 import type { TemplateAllowedTypes } from "./string";
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type EmptyObject = {};
 export type AnyPrototype = object | null;
 export type WithoutKey<T, K extends keyof T> = Omit<T, K>;
@@ -18,12 +19,12 @@ export type DeepMutable<T> = T extends PrimitiveTypes
   ? DeepMutable<ArrayItem<T>>[]
   : { -readonly [K in keyof T]: DeepMutable<T[K]> };
 
-export type DeepPartial<T> = T extends PrimitiveTypes | AnyArray
+export type DeepPartial<T> = T extends AnyArray | PrimitiveTypes
   ? T
   : { [K in keyof T]?: DeepPartial<T[K]> };
 export type AccessPaths<T> = T extends object
   ? {
-      [K in keyof T]: [K] | [K, ...AccessPaths<T[K]>];
+      [K in keyof T]: [K, ...AccessPaths<T[K]>] | [K];
     }[keyof T]
   : [];
 
@@ -47,15 +48,15 @@ export type StringAccessKeyOf<T> = T extends PrimitiveTypes
 export type StringAccessPaths<T> = T extends object
   ? {
       [K in StringAccessKeyOf<T> & keyof T]:
-        | [K]
-        | [K, ...StringAccessPaths<T[K]>];
+        | [K, ...StringAccessPaths<T[K]>]
+        | [K];
     }[StringAccessKeyOf<T> & keyof T]
   : [];
-type NonExtensibleMixin = {
+interface NonExtensibleMixin {
   readonly [key: string]: never;
   readonly [index: number]: never;
-};
+}
 
-export type NonExtensibleObject<T> = T & NonExtensibleMixin;
+export type NonExtensibleObject<T> = NonExtensibleMixin & T;
 export type SealedObject<T> = NonExtensibleObject<T>;
-export type FrozenObject<T> = Readonly<T> & NonExtensibleMixin;
+export type FrozenObject<T> = NonExtensibleMixin & Readonly<T>;

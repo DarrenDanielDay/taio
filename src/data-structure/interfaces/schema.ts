@@ -7,7 +7,7 @@ export interface IContainer<T> extends Iterable<T> {
    * The number of elements in the container.
    */
   readonly size: number;
-  [Symbol.iterator](): Iterator<T, void, undefined>;
+  [Symbol.iterator](): Iterator<T, void>;
 }
 
 export interface ILinearContainer<T> extends IContainer<T> {

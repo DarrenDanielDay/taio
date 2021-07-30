@@ -1,4 +1,5 @@
 import type { AnyMethod, Method, MethodKeys } from "../types/concepts";
+import type { AnyPrototype } from "../types/object";
 
 export function parameter<
   This,
@@ -7,7 +8,7 @@ export function parameter<
 >(
   decorator: (target: This, key: Key, index: Index) => void
 ): ParameterDecorator {
-  // @ts-expect-error
+  // @ts-expect-error Contravariance
   return decorator;
 }
 
@@ -23,22 +24,22 @@ export function method<This, Key extends MethodKeys<This>>(
     target: This,
     key: Key,
     descriptor: TypedPropertyDescriptor<ExtractToMethod<This, Key>>
-  ) => void | TypedPropertyDescriptor<ExtractToMethod<This, Key>>
+  ) => TypedPropertyDescriptor<ExtractToMethod<This, Key>> | void
 ): MethodDecorator {
-  // @ts-expect-error
+  // @ts-expect-error Contravariance
   return decorator;
 }
 
 export function property<This, Key extends keyof This>(
   decorator: (target: This, key: Key) => void
 ): PropertyDecorator {
-  // @ts-expect-error
+  // @ts-expect-error Contravariance
   return decorator;
 }
 
-export function cls<Class extends Function>(
-  decorator: (cls: Class) => void | Class
+export function cls<Class extends AnyPrototype>(
+  decorator: (cls: Class) => Class | void
 ): ClassDecorator {
-  // @ts-expect-error
+  // @ts-expect-error Contravariance
   return decorator;
 }

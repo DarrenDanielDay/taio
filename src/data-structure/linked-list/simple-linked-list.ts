@@ -1,7 +1,7 @@
 import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
-import type { ILinkedList, ILinkedNode } from "../interfaces/schema";
+import type { ILinkedNode, ILinkedList } from "../interfaces/schema";
 
 const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
   enumerable: true,
@@ -12,14 +12,14 @@ const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
 class SimpleLinkedList<T> implements ILinkedList<T> {
   @iteration.modifier
   readonly $modified!: number;
-  @readonly.decorate<"head">()
+  @readonly.decorate<"head">(undefined)
   readonly head: ILinkedNode<T> | undefined;
-  @readonly.decorate<"tail">()
+  @readonly.decorate<"tail">(undefined)
   readonly tail: ILinkedNode<T> | undefined;
   @readonly.decorate<"size">(0)
   readonly size!: number;
   @ImmutableIteration
-  *[Symbol.iterator](this: SimpleLinkedList<T>): Iterator<T, void, undefined> {
+  *[Symbol.iterator](this: SimpleLinkedList<T>): Iterator<T, void> {
     let node = this.head;
     while (node) {
       yield node.value;

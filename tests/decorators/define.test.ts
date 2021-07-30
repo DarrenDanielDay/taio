@@ -62,7 +62,7 @@ describe("accesser decorator", () => {
         return this.prop * 2;
       })
       get bar() {
-        return 1;
+        return 1 * 1;
       }
       prop = 3;
     }

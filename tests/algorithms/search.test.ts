@@ -19,20 +19,20 @@ describe("search algorithm", () => {
     node,
     key,
   }: {
-    node: any;
+    node: object;
     key: string;
-  }): { key: string; node: any }[] =>
+  }): { key: string; node: object }[] =>
     typeof node !== "object"
       ? []
-      : Object.keys(Reflect.get(node, key)).map((k) => ({
+      : Object.keys(Reflect.get(node, key) as object).map((k) => ({
           key: k,
-          node: Reflect.get(node, key),
+          node: Reflect.get(node, key) as object,
         }));
 
   it("should be the order", () => {
     expect(
       [
-        ...dfs<{ node: any; key: string }, string>(
+        ...dfs<{ node: object; key: string }, string>(
           { node: jsonTree, key: "a" },
           next,
           ({ key }) => key.toString()
@@ -43,7 +43,7 @@ describe("search algorithm", () => {
   it("should be the order", () => {
     expect(
       [
-        ...bfs<{ node: any; key: string }, string>(
+        ...bfs<{ node: object; key: string }, string>(
           { node: jsonTree, key: "a" },
           next,
           ({ key }) => key.toString()
@@ -57,18 +57,18 @@ describe("search algorithm", () => {
       node,
       key,
     }: {
-      node: any;
+      node: object;
       key: string;
-    }): { key: string; node: any }[] =>
+    }): { key: string; node: object }[] =>
       node !== jsonTree
         ? []
-        : Object.keys(Reflect.get(node, key)).map((k) => ({
+        : Object.keys(Reflect.get(node, key) as object).map((k) => ({
             key: k,
-            node: Reflect.get(node, key),
+            node: Reflect.get(node, key) as object,
           }));
     expect(
       [
-        ...bfs<{ node: any; key: string }, string>(
+        ...bfs<{ node: object; key: string }, string>(
           { node: jsonTree, key: "a" },
           next2,
           ({ key }) => key.toString()
@@ -82,18 +82,18 @@ describe("search algorithm", () => {
       node,
       key,
     }: {
-      node: any;
+      node: object;
       key: string;
-    }): { key: string; node: any }[] =>
+    }): { key: string; node: object }[] =>
       Array.isArray(node)
         ? []
-        : Object.keys(Reflect.get(node, key)).map((k) => ({
+        : Object.keys(Reflect.get(node, key) as object).map((k) => ({
             key: k,
-            node: Reflect.get(node, key),
+            node: Reflect.get(node, key) as object,
           }));
     expect(
       [
-        ...dfs<{ node: any; key: string }, string>(
+        ...dfs<{ node: object; key: string }, string>(
           { node: jsonTree, key: "a" },
           next3,
           ({ key }) => key.toString()
@@ -102,7 +102,7 @@ describe("search algorithm", () => {
     ).toBe("abcdefghi01");
   });
   it("should not search deep", () => {
-    const iterator = dfs<{ node: any; key: string }, string>(
+    const iterator = dfs<{ node: object; key: string }, string>(
       { node: jsonTree, key: "a" },
       next,
       ({ key }) => key.toString()
@@ -119,7 +119,7 @@ describe("search algorithm", () => {
     expect(result).toBe("abefghi0j1k");
   });
   it("should not search deep", () => {
-    const iterator = bfs<{ node: any; key: string }, string>(
+    const iterator = bfs<{ node: object; key: string }, string>(
       { node: jsonTree, key: "a" },
       next,
       ({ key }) => key.toString()

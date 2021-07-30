@@ -1,6 +1,8 @@
-import { MethodDecoratorContext, WrappedMethod } from "../../decorators/define";
+import type { MethodDecoratorContext } from "../../decorators/define";
+import { WrappedMethod } from "../../decorators/define";
 import { ReadonlyOutside } from "../../decorators/limitations";
 import { invalidOperation } from "../../internal/exceptions";
+import type { MethodKeys } from "../../types/concepts";
 import type { IContainer } from "../interfaces/schema";
 
 export const ImmutableIteration = WrappedMethod<
@@ -28,14 +30,15 @@ export const ImmutableIteration = WrappedMethod<
   },
   { writable: false }
 );
-// @ts-expect-error
-export const Modified = WrappedMethod<IContainer<unknown>, PropertyKey>(
-  function (this: IContainer<unknown>, { func }, ...args) {
-    const result = (func as Function).apply(this, args);
-    modify.apply(this);
-    return result;
-  }
-);
+
+export const Modified = WrappedMethod<
+  IContainer<unknown>,
+  MethodKeys<IContainer<unknown>>
+>(function (this: IContainer<unknown>, { func }, ...args) {
+  const result = func.apply(this, args);
+  modify.apply(this);
+  return result;
+});
 const readonly$modifier = ReadonlyOutside<IContainer<unknown>>({
   enumerable: false,
   configurable: false,

@@ -5,7 +5,8 @@ import type {
   TupleSlices,
 } from "../../types/array";
 import type { AnyFunc, Func } from "../../types/concepts";
-import { isPlaceholder, Placeholder, _$_ } from "./placeholder";
+import type { Placeholder } from "./placeholder";
+import { isPlaceholder, _$_ } from "./placeholder";
 
 type PlaceHoldedParams<P extends AnyArray> = P extends EmptyTuple
   ? EmptyTuple
@@ -26,13 +27,11 @@ type ApplyArgs<
     : [Exclude<P[0], Placeholder>, ...ApplyArgs<CutFirst<P>, CutFirst<Args>>]
   : never;
 
-interface Currying<P extends AnyArray, R> {
-  <Args extends TupleSlices<PlaceHoldedParams<P>>>(...args: Args): CurryingCall<
-    P,
-    R,
-    Args
-  >;
-}
+type Currying<P extends AnyArray, R> = <
+  Args extends TupleSlices<PlaceHoldedParams<P>>
+>(
+  ...args: Args
+) => CurryingCall<P, R, Args>;
 
 function _currying(fn: AnyFunc, passed: unknown[]) {
   return (...args: unknown[]) => {
@@ -51,7 +50,7 @@ function _currying(fn: AnyFunc, passed: unknown[]) {
       newPassed[index] = args[i];
     }
     if (newPassed.every((param) => !isPlaceholder(param))) {
-      return fn.apply(undefined, newPassed);
+      return fn(...newPassed);
     } else {
       return _currying(fn, newPassed);
     }
@@ -64,6 +63,6 @@ export function currying<P extends AnyArray, R>(
 ): Currying<P, R> {
   count = count ?? fn.length;
   const passed: unknown[] = new Array(count).fill(_$_);
-  // @ts-expect-error
+  // @ts-expect-error Implementation detail
   return _currying(fn, passed);
 }

@@ -143,9 +143,9 @@ export type KebabCase<Str extends string> = Lowercase<
 >;
 
 export type TemplateAllowedTypes =
-  | string
-  | number
+  | bigint
   | boolean
+  | number
+  | string
   | null
-  | undefined
-  | bigint;
+  | undefined;

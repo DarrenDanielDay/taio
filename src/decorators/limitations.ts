@@ -1,12 +1,11 @@
 import { DefaultMap } from "../data-structure/map/default-map";
 import { invalidOperation } from "../internal/exceptions";
-import {
-  overwriteDescriptorConfig,
-  PropertyConfig,
-} from "../utils/object-operation";
+import type { AnyConstructor } from "../types/concepts";
+import type { PropertyConfig } from "../utils/object-operation";
+import { overwriteDescriptorConfig } from "../utils/object-operation";
 import { cls, property } from "./typed";
 
-export const Sealed = cls<Function>((classObject) => {
+export const Sealed = cls<AnyConstructor>((classObject) => {
   const proxy = new Proxy(classObject, {
     construct: function (...args) {
       if (args[2] !== proxy) {
@@ -20,14 +19,14 @@ export const Sealed = cls<Function>((classObject) => {
   return proxy;
 });
 
-export const Freeze = cls<Function>((classObject) => {
+export const Freeze = cls<AnyConstructor>((classObject) => {
   Object.freeze(classObject);
   Object.freeze(classObject.prototype);
 });
 export class Property<This, Key extends keyof This> {
   #symbol = Symbol();
   #initValue;
-  constructor(initValue?: This[Key]) {
+  constructor(initValue: This[Key]) {
     this.#initValue = initValue;
   }
   get(instance: This): This[Key] {
@@ -35,8 +34,7 @@ export class Property<This, Key extends keyof This> {
       instance,
       this.#symbol
     ) as TypedPropertyDescriptor<This[Key]> | undefined;
-    // @ts-expect-error
-    return descriptor ? descriptor.value : this.#initValue;
+    return descriptor ? descriptor.value! : this.#initValue;
   }
   set(instance: This, value: This[Key]) {
     const descriptor = Object.getOwnPropertyDescriptor(
@@ -54,9 +52,9 @@ export class Property<This, Key extends keyof This> {
   }
 }
 
-export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
+export const ReadonlyOutside = <This>(propConfig?: PropertyConfig) => {
   const propertyMap = new DefaultMap<keyof This, Property<This, keyof This>>(
-    () => new Property()
+    () => new Property(undefined!)
   );
   const accessor = {
     get<Key extends keyof This>(instance: This, key: Key) {
@@ -65,7 +63,7 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
     set<Key extends keyof This>(instance: This, key: Key, value: This[Key]) {
       return propertyMap.get(key).set(instance, value);
     },
-    decorate<Key extends keyof This>(initValue?: This[Key]) {
+    decorate<Key extends keyof This>(initValue: This[Key]) {
       return property<This, Key>((target, key) => {
         Object.defineProperty(
           target,
@@ -75,8 +73,7 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
               if (!propertyMap.has(key)) {
                 const prop = new Property(initValue);
                 propertyMap.set(key, prop);
-                // @ts-expect-error
-                accessor.set(this, initValue);
+                accessor.set(this, key, initValue);
                 return initValue;
               }
               return accessor.get(this, key);
@@ -90,4 +87,4 @@ export function ReadonlyOutside<This>(propConfig?: PropertyConfig) {
     },
   };
   return accessor;
-}
+};

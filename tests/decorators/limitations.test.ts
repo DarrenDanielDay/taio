@@ -3,7 +3,9 @@ import { Freeze, Sealed } from "../../src/decorators/limitations";
 describe("sealed decorator", () => {
   it("should throw when trying to instantiate subclass", () => {
     @Sealed
-    class Foo {}
+    class Foo {
+      bar = 1;
+    }
 
     class Bar extends Foo {
       constructor() {
@@ -19,7 +21,9 @@ describe("sealed decorator", () => {
 describe("freeze decorator", () => {
   it("should throw when add method", () => {
     @Freeze
-    class Foo {}
+    class Foo {
+      bar = 1;
+    }
     expect(() => {
       Foo.prototype.toString = function () {
         return "<foo object>";

@@ -7,6 +7,6 @@ import type { Add } from "../../../types/number";
  * @returns a + b
  */
 export function add<A extends number, B extends number>(a: A, b: B): Add<A, B> {
-  // @ts-expect-error
+  // @ts-expect-error Number calculation
   return +a + +b;
 }

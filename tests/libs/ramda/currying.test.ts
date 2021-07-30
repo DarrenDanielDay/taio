@@ -33,8 +33,8 @@ describe("Currying", () => {
     ).toBe(NaN.toString());
   });
   it("should break when have redundant parameters", () => {
-    const fn = (a: number, b: string) => a + b;
-    // @ts-expect-error
+    const fn = (a: number, b: string) => `${a}${b}`;
+    // @ts-expect-error Directive as type check
     const params: Parameters<typeof fn> = [1, "2", 3];
     expect(currying(fn, 2)(...params)).toBe("12");
   });

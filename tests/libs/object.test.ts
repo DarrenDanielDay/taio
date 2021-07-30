@@ -30,7 +30,8 @@ describe("typed object", () => {
       ["a", 1],
       ["b", 2],
     ] as const);
-    // @ts-expect-error
+    // @ts-expect-error Directive as type check
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (obj2.b === 3) {
       fail("impossible");
     }

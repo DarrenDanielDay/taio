@@ -9,10 +9,10 @@ class LinkedQueue<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
   @iteration.modifier
   readonly $modified!: number;
-  get size(): number {
+  get size() {
     return this.#linkedList.size;
   }
-  *[Symbol.iterator](): Iterator<T, void, undefined> {
+  *[Symbol.iterator](): Iterator<T, void> {
     yield* this.#linkedList;
   }
   @Modified

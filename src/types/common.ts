@@ -1,14 +1,15 @@
+import type { AnyFunc } from "./concepts";
 import type { WithoutKey } from "./object";
 
 export type PrimitiveTypes =
-  | string
-  | number
+  | bigint
   | boolean
-  | undefined
-  | null
+  | number
+  | string
   | symbol
-  | bigint;
-export type Nullish = undefined | null;
+  | null
+  | undefined;
+export type Nullish = null | undefined;
 export interface PrimitiveTypeMapping {
   string: string;
   number: number;
@@ -20,7 +21,7 @@ export interface PrimitiveTypeMapping {
 }
 export interface TypeofMapping
   extends WithoutKey<PrimitiveTypeMapping, "null"> {
-  function: Function;
+  function: AnyFunc;
   object: object;
 }
 export type TypeOfLiterals = keyof TypeofMapping;

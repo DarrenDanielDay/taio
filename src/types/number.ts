@@ -80,7 +80,7 @@ export type ListDigitToCount<Digits extends Digit[]> = Digits extends [
   infer L
 ]
   ? H extends Digit[]
-    ? [...MultiplyTen<ListDigitToCount<H>>, ...MapDigitToCount<L & Digit>]
+    ? [...MultiplyTen<ListDigitToCount<H>>, ...MapDigitToCount<Digit & L>]
     : AnyArray
   : [];
 
@@ -91,7 +91,7 @@ export type ListDigitMultiply<
   ? H extends Digit[]
     ? [
         ...MultiplyTen<ListDigitMultiply<H, Multiplicand>>,
-        ...MultiplyByDigit<L & Digit, ListDigitToCount<Multiplicand>>
+        ...MultiplyByDigit<Digit & L, ListDigitToCount<Multiplicand>>
       ]
     : AnyArray
   : [];

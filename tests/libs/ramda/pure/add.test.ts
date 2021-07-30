@@ -7,8 +7,8 @@ describe("Add pure function", () => {
   });
   it("should have constraint", () => {
     let three = add(1, 2);
-    // @ts-expect-error
-    !!three && (three = add(1, 1));
+    // @ts-expect-error Directive as type check
+    three = add(1, 1);
     three = 3;
     expect(three).toBe(3);
   });
