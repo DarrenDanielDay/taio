@@ -33,7 +33,7 @@ export type AccessByPath<
   Path extends AccessPaths<T>
 > = Path extends EmptyTuple
   ? T
-  : Path extends [infer Current, ...infer Rest]
+  : Path extends readonly [infer Current, ...infer Rest]
   ? Current extends keyof T
     ? Rest extends AccessPaths<T[Current]>
       ? AccessByPath<T[Current], Rest>

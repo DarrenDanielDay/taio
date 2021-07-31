@@ -116,7 +116,9 @@ export interface SetPrototypeOfOperation<T, P> extends BaseOperation<T> {
   result: boolean;
 }
 
-export function createPureTrackerProxyHandler<T>(tracks: Operation[]) {
+export function createPureTrackerProxyHandler<T extends object>(
+  tracks: Operation[]
+): Required<ProxyHandler<T>> {
   const proxyHandler: Required<ProxyHandler<AnyFunc>> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
@@ -190,8 +192,8 @@ export function createPureTrackerProxyHandler<T>(tracks: Operation[]) {
       return result;
     },
   };
-  // @ts-expect-error Proxy force cast
-  return proxyHandler as Required<ProxyHandler<T>>;
+  // @ts-expect-error Skipped type check because [[Target]] is a function
+  return proxyHandler;
 }
 
 export function createExpressionAnalyser(

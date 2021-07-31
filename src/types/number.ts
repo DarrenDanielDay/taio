@@ -8,8 +8,8 @@ export type Add<A extends number, B extends number> = [
 export type Multiply<
   A extends number,
   B extends number
-> = ListChar<`${A}`> extends Digit[]
-  ? ListChar<`${B}`> extends Digit[]
+> = ListChar<`${A}`> extends readonly Digit[]
+  ? ListChar<`${B}`> extends readonly Digit[]
     ? ListDigitMultiply<ListChar<`${A}`>, ListChar<`${B}`>>["length"]
     : number
   : number;
@@ -71,24 +71,22 @@ type MultiplyTen<Arr extends AnyArray> = [
 
 export type ToCount<N extends string> = N extends EmptyString
   ? EmptyTuple
-  : ListChar<N> extends Digit[]
+  : ListChar<N> extends readonly Digit[]
   ? ListDigitToCount<ListChar<N>>
   : AnyArray;
 
-export type ListDigitToCount<Digits extends Digit[]> = Digits extends [
-  ...infer H,
-  infer L
-]
-  ? H extends Digit[]
-    ? [...MultiplyTen<ListDigitToCount<H>>, ...MapDigitToCount<Digit & L>]
-    : AnyArray
-  : [];
+export type ListDigitToCount<Digits extends readonly Digit[]> =
+  Digits extends readonly [...infer H, infer L]
+    ? H extends readonly Digit[]
+      ? [...MultiplyTen<ListDigitToCount<H>>, ...MapDigitToCount<Digit & L>]
+      : AnyArray
+    : [];
 
 export type ListDigitMultiply<
-  Digits extends Digit[],
-  Multiplicand extends Digit[]
-> = Digits extends [...infer H, infer L]
-  ? H extends Digit[]
+  Digits extends readonly Digit[],
+  Multiplicand extends readonly Digit[]
+> = Digits extends readonly [...infer H, infer L]
+  ? H extends readonly Digit[]
     ? [
         ...MultiplyTen<ListDigitMultiply<H, Multiplicand>>,
         ...MultiplyByDigit<Digit & L, ListDigitToCount<Multiplicand>>

@@ -74,10 +74,7 @@ export function Accesser<
   return method(
     // @ts-expect-error Contravariance
     (target: This, key: Key, describer: TypedPropertyDescriptor<This[Key]>) => {
-      const originalAccessor = describer[type] as Accessors<
-        This,
-        This[Key]
-      >[Type];
+      const originalAccessor = describer[type]!;
       // @ts-expect-error Index type inferred as union type
       describer[type] = function (
         this: This,
@@ -85,8 +82,8 @@ export function Accesser<
       ) {
         return handler.call(
           this,
-          { func: originalAccessor, name: key, target },
           // @ts-expect-error Index type inferred as union type
+          { func: originalAccessor, name: key, target },
           ...args
         );
       };

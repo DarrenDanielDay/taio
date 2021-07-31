@@ -1,4 +1,4 @@
-import type { CutFirst } from "./array";
+import type { CutFirst, EmptyTuple } from "./array";
 
 export type EmptyString = "";
 export type Underline = "_";
@@ -71,11 +71,11 @@ export type ListChar<Str extends string> = Str extends EmptyString
   ? []
   : [TakeFirst<Str>, ...ListChar<TakeRest<Str>>];
 export type Join<
-  Arr extends string[],
+  Arr extends readonly string[],
   Delimiter extends string = EmptyString
-> = Arr extends []
+> = Arr extends EmptyTuple
   ? EmptyString
-  : Arr extends [infer T]
+  : Arr extends readonly [infer T]
   ? T extends string
     ? T
     : never
@@ -87,21 +87,21 @@ export type Split<
   ? [Head, ...Split<Tail, Splitter>]
   : [Str];
 
-type TitleMapFn<Result extends string[], Arr extends string[]> = Arr extends [
-  string,
-  ...infer Rest
-]
-  ? Rest extends string[]
+type TitleMapFn<
+  Result extends readonly string[],
+  Arr extends readonly string[]
+> = Arr extends readonly [string, ...infer Rest]
+  ? Rest extends readonly string[]
     ? TitleMapFn<[...Result, Capitalize<Arr[0]>], Rest>
     : never
   : [Result, []];
-type TitleMap<Arr extends string[]> = TitleMapFn<[], Arr>[0];
+type TitleMap<Arr extends readonly string[]> = TitleMapFn<[], Arr>[0];
 
 export type PascalCase<Str extends string> = Join<
   TitleMap<SplitFn<[], [], Str>>
 >;
 
-type _Expecting<Buffer extends string[]> = Buffer extends []
+type _Expecting<Buffer extends readonly string[]> = Buffer extends EmptyTuple
   ? Chars | Digit
   : Buffer[0] extends Chars
   ? LowerCases
@@ -110,8 +110,8 @@ type _Expecting<Buffer extends string[]> = Buffer extends []
   : never;
 
 type SplitFn<
-  Result extends string[],
-  Buffer extends string[],
+  Result extends readonly string[],
+  Buffer extends readonly string[],
   Source extends string
 > = Source extends EmptyString
   ? Chars | Digit extends _Expecting<Buffer> // Buffer is Empty

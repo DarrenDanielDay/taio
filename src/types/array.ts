@@ -2,22 +2,23 @@
 export type AnyArray = readonly unknown[];
 export type AnyParams = any[];
 export type EmptyTuple = readonly [];
-export type ArrayItem<Arr extends AnyArray> = Arr extends readonly (infer T)[]
-  ? T
-  : never;
-export type Reverse<Arr extends AnyArray> = Arr extends [
+export type ArrayItem<Arr extends AnyArray> = Arr[number];
+export type Reverse<Arr extends AnyArray> = Arr extends readonly [
   ...infer Rest,
   infer Last
 ]
   ? [Last, ...Reverse<Rest>]
   : [];
-export type CutFirst<Arr extends AnyArray> = Arr extends [
+export type CutFirst<Arr extends AnyArray> = Arr extends readonly [
   unknown,
   ...infer Rest
 ]
   ? Rest
   : [];
-export type CutLast<Arr extends AnyArray> = Arr extends [...infer Rest, unknown]
+export type CutLast<Arr extends AnyArray> = Arr extends readonly [
+  ...infer Rest,
+  unknown
+]
   ? Rest
   : [];
 export type FirstOf<Arr extends AnyArray> = Arr extends EmptyTuple
@@ -25,7 +26,7 @@ export type FirstOf<Arr extends AnyArray> = Arr extends EmptyTuple
   : Arr[0];
 export type LastOf<Arr extends AnyArray> = Arr extends EmptyTuple
   ? never
-  : Arr extends [...AnyArray, infer R]
+  : Arr extends readonly [...AnyArray, infer R]
   ? R
   : never;
 export type TupleSlices<Arr extends AnyArray> = Arr extends EmptyTuple
@@ -33,3 +34,4 @@ export type TupleSlices<Arr extends AnyArray> = Arr extends EmptyTuple
   : Arr extends readonly [infer First, ...infer Rest]
   ? EmptyTuple | readonly [First, ...TupleSlices<Rest>]
   : never;
+export type TupleUnion<Arr extends AnyArray> = Arr[Extract<keyof Arr, number>];

@@ -1,13 +1,6 @@
 # For this project
 playground.*
-dev-build
 build
-amd
-cjs
-esm
-sys
-umd
-esbuild
 ## TypeDoc generated
 *-docs
 

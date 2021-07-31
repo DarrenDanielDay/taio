@@ -1,3 +1,4 @@
+import { typeEqual } from "../../../../src/functions/common";
 import { add } from "../../../../src/libs/ramda/pure/add";
 
 describe("Add pure function", () => {
@@ -7,9 +8,7 @@ describe("Add pure function", () => {
   });
   it("should have constraint", () => {
     let three = add(1, 2);
-    // @ts-expect-error Directive as type check
-    three = add(1, 1);
-    three = 3;
+    expect(typeEqual<3, typeof three>(true)).toBe(true);
     expect(three).toBe(3);
   });
 });

@@ -34,7 +34,7 @@ describe("Currying", () => {
   });
   it("should break when have redundant parameters", () => {
     const fn = (a: number, b: string) => `${a}${b}`;
-    // @ts-expect-error Directive as type check
+    // @ts-expect-error Error by design for testing behavior of passing arguments more than required
     const params: Parameters<typeof fn> = [1, "2", 3];
     expect(currying(fn, 2)(...params)).toBe("12");
   });

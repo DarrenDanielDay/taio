@@ -1,3 +1,4 @@
+import { typeEqual } from "../../../../src/functions/common";
 import { multiply } from "../../../../src/libs/ramda/pure/multiply";
 
 describe("Multiply pure function", () => {
@@ -9,9 +10,7 @@ describe("Multiply pure function", () => {
 
   it("should have constraint", () => {
     let nine = multiply(3, 3);
-    // @ts-expect-error Directive as type check
-    nine = 0;
-    nine = multiply(3, 3);
+    expect(typeEqual<9, typeof nine>(true)).toBe(true);
     expect(nine).toBe(9);
   });
 });

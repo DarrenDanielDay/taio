@@ -30,24 +30,21 @@ export class Property<This, Key extends keyof This> {
     this.#initValue = initValue;
   }
   get(instance: This): This[Key] {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      instance,
-      this.#symbol
-    ) as TypedPropertyDescriptor<This[Key]> | undefined;
+    const descriptor: TypedPropertyDescriptor<This[Key]> | undefined =
+      Object.getOwnPropertyDescriptor(instance, this.#symbol);
     return descriptor ? descriptor.value! : this.#initValue;
   }
   set(instance: This, value: This[Key]) {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      instance,
-      this.#symbol
-    ) as TypedPropertyDescriptor<This[Key]> | undefined;
+    const descriptor: TypedPropertyDescriptor<This[Key]> | undefined =
+      Object.getOwnPropertyDescriptor(instance, this.#symbol);
     if (!descriptor) {
       Object.defineProperty(instance, this.#symbol, {
         value,
         writable: true,
       });
     } else {
-      Reflect.set(instance as unknown as object, this.#symbol, value);
+      // @ts-expect-error Skipped check of object type
+      Reflect.set(instance, this.#symbol, value);
     }
   }
 }
@@ -57,8 +54,9 @@ export const ReadonlyOutside = <This>(propConfig?: PropertyConfig) => {
     () => new Property(undefined!)
   );
   const accessor = {
-    get<Key extends keyof This>(instance: This, key: Key) {
-      return propertyMap.get(key).get(instance) as This[Key];
+    get<Key extends keyof This>(instance: This, key: Key): This[Key] {
+      // @ts-expect-error Managed by correct type, so it should be corresponded.
+      return propertyMap.get(key).get(instance);
     },
     set<Key extends keyof This>(instance: This, key: Key, value: This[Key]) {
       return propertyMap.get(key).set(instance, value);

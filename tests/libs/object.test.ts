@@ -1,3 +1,4 @@
+import { typeEqual } from "../../src/functions/common";
 import { TypedObject } from "../../src/libs/object";
 
 describe("typed object", () => {
@@ -30,10 +31,6 @@ describe("typed object", () => {
       ["a", 1],
       ["b", 2],
     ] as const);
-    // @ts-expect-error Directive as type check
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (obj2.b === 3) {
-      fail("impossible");
-    }
+    expect(typeEqual<2, typeof obj2["b"]>(true)).toBe(true);
   });
 });
