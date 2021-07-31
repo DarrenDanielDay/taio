@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "UMD",
-    "outDir": "umd"
-  },
-  "extends": "./tsconfig.prod.json"
-}
