@@ -7,7 +7,7 @@
   "type": "module",
   "files": [
     "src",
-    "esm",
+    "build",
     "tsconfig.json",
     ".prettierignore"
   ],
