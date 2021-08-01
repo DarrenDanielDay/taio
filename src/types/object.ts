@@ -1,6 +1,7 @@
 import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
 import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
 import type { TemplateAllowedTypes } from "./string";
+// To ensure it's always empty, we should use type alias rather than interface.
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type EmptyObject = {};
 export type AnyPrototype = object | null;
@@ -52,6 +53,7 @@ export type StringAccessPaths<T> = T extends object
         | [K];
     }[StringAccessKeyOf<T> & keyof T]
   : [];
+// This type is not exported so it can be a interface.
 interface NonExtensibleMixin {
   readonly [key: string]: never;
   readonly [index: number]: never;

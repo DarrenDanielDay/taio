@@ -27,3 +27,7 @@ export type ConstructorOf<T, Params extends AnyParams> = new (
   ...args: Params
 ) => T;
 export type AnyConstructor = ConstructorOf<unknown, AnyParams>;
+export type InstanceSource<T> =
+  | ConstructorOf<T, AnyParams>
+  | { [Symbol.hasInstance](value: unknown): value is T };
+export type AnyInstanceSource = InstanceSource<unknown>;

@@ -1,3 +1,4 @@
+import type { InstanceSource } from "../../types/concepts";
 import type { EmptyObject } from "../../types/object";
 import type { Validator } from "./common";
 import { isNull } from "./primitive";
@@ -16,3 +17,9 @@ export const isObject =
     Object.entries<Validator<T[keyof T]>>(schema).every(([key, validator]) =>
       validator(Reflect.get(value, key))
     );
+
+export const isInstanceOf =
+  <T>(constructor: InstanceSource<T>): Validator<T> =>
+  (value): value is T =>
+    // @ts-expect-error Symbol.hasInstance is not considered by TypeScript
+    value instanceof constructor;
