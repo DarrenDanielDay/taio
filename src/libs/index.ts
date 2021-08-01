@@ -1,3 +1,2 @@
-export * as Object from "./typescript/object";
-export * as Reflect from "./typescript/reflect";
-export * as Validator from "../utils/validator";
+export * as Custom from "./custom";
+export * as Typescript from "./typescript";
