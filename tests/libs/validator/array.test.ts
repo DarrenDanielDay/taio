@@ -3,6 +3,7 @@ import {
   isArrayOf,
   isIntersectionOf,
   isIntersectionThat,
+  isMergedObjectThat,
   isTupleOf,
   isTupleThat,
   isUnionOf,
@@ -99,20 +100,29 @@ describe("Array type guard factory", () => {
       isObject({ a: isNumber }),
       isObject({ b: isString })
     );
+    const mergedValidator = isMergedObjectThat(
+      isObject({ a: isNumber }),
+      isObject({ b: isString })
+    );
     const tuple: unknown = ["a", 2, 10];
-    const u: unknown = 1;
-    const i: unknown = { a: 1, b: "str" };
+    const union: unknown = 1;
+    const intersection: unknown = { a: 1, b: "str" };
+    const merged: unknown = { a: 1, b: "str" };
     if (
       tupleValidator(tuple) &&
-      unionValidator(u) &&
-      intersectionValidator(i)
+      unionValidator(union) &&
+      intersectionValidator(intersection) &&
+      mergedValidator(merged)
     ) {
       const [str, num, ten] = tuple;
       expect(typeEqual<string, typeof str>(true)).toBe(true);
       expect(typeEqual<number, typeof num>(true)).toBe(true);
       expect(typeEqual<10, typeof ten>(true)).toBe(true);
-      expect(typeEqual<number | string, typeof u>(true)).toBe(true);
-      expect(typeEqual<{ a: number } & { b: string }, typeof i>(true)).toBe(
+      expect(typeEqual<number | string, typeof union>(true)).toBe(true);
+      expect(
+        typeEqual<{ a: number } & { b: string }, typeof intersection>(true)
+      ).toBe(true);
+      expect(typeEqual<{ a: number; b: string }, typeof merged>(true)).toBe(
         true
       );
     } else {

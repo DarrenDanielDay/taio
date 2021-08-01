@@ -29,7 +29,9 @@ export function enumValues<E extends EnumUnderlayingType>(
   );
 }
 
-export function enumKeys<T>(standardEnum: T) {
+export function enumKeys<T extends StandardEnum<EnumUnderlayingType>>(
+  standardEnum: T
+) {
   return Object.keys(standardEnum).filter((key): key is StringKey<T> =>
     isNaN(+key)
   );

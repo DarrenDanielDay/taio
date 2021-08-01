@@ -1,3 +1,5 @@
+import type { IndexKey } from "./converts";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyArray = readonly unknown[];
 export type AnyParams = any[];
@@ -34,4 +36,4 @@ export type TupleSlices<Arr extends AnyArray> = Arr extends EmptyTuple
   : Arr extends readonly [infer First, ...infer Rest]
   ? EmptyTuple | readonly [First, ...TupleSlices<Rest>]
   : never;
-export type TupleUnion<Arr extends AnyArray> = Arr[Extract<keyof Arr, number>];
+export type TupleUnion<Arr extends AnyArray> = Arr[IndexKey<Arr>];

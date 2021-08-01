@@ -1,5 +1,5 @@
 import type { AnyArray, ArrayItem } from "../../types/array";
-import type { UnionToIntersection } from "../../types/converts";
+import type { MergeAll, UnionToIntersection } from "../../types/converts";
 import type { Validator } from "./common";
 
 export const isArrayOf =
@@ -68,6 +68,21 @@ export const isIntersectionThat: <
   UnionToIntersection<ArrayItem<MapValidatorsToTypes<Validators>>>
 > = isIntersectionOf;
 export const intersectionThat = isIntersectionThat;
+/**
+ * Same logic with `isIntersectionOf` but different type inference.
+ */
+// @ts-expect-error Conditional type
+export const isMergedObjectThat: <
+  Validators extends readonly Validator<unknown>[]
+>(
+  ...validators: Validators
+) => Validator<
+  MergeAll<
+    MapValidatorsToTypes<Validators> extends readonly object[]
+      ? MapValidatorsToTypes<Validators>
+      : never
+  >
+> = isIntersectionThat;
 
 export const isAnyOf =
   <Types extends AnyArray>(...values: Types): Validator<ArrayItem<Types>> =>

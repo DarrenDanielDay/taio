@@ -1,5 +1,5 @@
 import type { AnyArray, ArrayItem, EmptyTuple } from "../types/array";
-import type { StringKey, UnionToIntersection } from "../types/converts";
+import type { Merge, StringKey, UnionToIntersection } from "../types/converts";
 import type {
   AnyPrototype,
   EmptyObject,
@@ -35,7 +35,7 @@ type ConstructFromEntries<
   ? F extends readonly [infer K, infer V]
     ? R extends readonly (readonly [PropertyKey, unknown])[]
       ? K extends PropertyKey
-        ? ConstructFromEntries<R> & DefinedProperty<K, V>
+        ? Merge<ConstructFromEntries<R>, DefinedProperty<K, V>>
         : never
       : never
     : never
@@ -55,7 +55,7 @@ export interface ITypedObject {
   create<T extends object | null, Descriptors extends PropertyDescriptors>(
     prototype: T,
     descriptors: Descriptors
-  ): DefinedProperties<Descriptors> & (T extends null ? EmptyObject : T);
+  ): Merge<DefinedProperties<Descriptors>, T extends null ? EmptyObject : T>;
   defineProperty<T extends object, K extends PropertyKey, P>(
     obj: T,
     key: K,

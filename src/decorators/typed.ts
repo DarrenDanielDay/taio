@@ -1,10 +1,11 @@
 import type { AnyMethod, Method, MethodKeys } from "../types/concepts";
+import type { IndexKey } from "../types/converts";
 import type { AnyPrototype } from "../types/object";
 
 export function parameter<
   This,
   Key extends MethodKeys<This>,
-  Index extends Extract<keyof Parameters<This[Key]>, number>
+  Index extends IndexKey<Parameters<This[Key]>>
 >(
   decorator: (target: This, key: Key, index: Index) => void
 ): ParameterDecorator {

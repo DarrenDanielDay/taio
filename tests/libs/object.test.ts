@@ -32,5 +32,14 @@ describe("typed object", () => {
       ["b", 2],
     ] as const);
     expect(typeEqual<2, typeof obj2["b"]>(true)).toBe(true);
+    expect(typeEqual<{ a: 1; b: 2 }, typeof obj2>(true)).toBe(true);
+  });
+  it("should merge prototype", () => {
+    let proto = { a: 1, b: "b" };
+    let created = TypedObject.create(proto, { c: { value: 0n } });
+    expect([created.a, created.b, created.c]).toEqual([1, "b", 0n]);
+    expect(
+      typeEqual<{ a: number; b: string; c: bigint }, typeof created>(true)
+    ).toBe(true);
   });
 });
