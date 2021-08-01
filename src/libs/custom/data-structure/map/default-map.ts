@@ -1,4 +1,4 @@
-import type { Func } from "../../types/concepts";
+import type { Func } from "../../../../types/concepts";
 
 export class DefaultMap<Key, Value> extends Map<Key, Value> {
   #getDefault: Func<[Key], Value>;

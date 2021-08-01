@@ -1,12 +1,16 @@
-import type { AnyArray, ArrayItem, EmptyTuple } from "../types/array";
-import type { Merge, StringKey, UnionToIntersection } from "../types/converts";
+import type { AnyArray, ArrayItem, EmptyTuple } from "../../types/array";
+import type {
+  Merge,
+  StringKey,
+  UnionToIntersection,
+} from "../../types/converts";
 import type {
   AnyPrototype,
   EmptyObject,
   FrozenObject,
   NonExtensibleObject,
   SealedObject,
-} from "../types/object";
+} from "../../types/object";
 
 type DefinedProperties<
   Descriptors extends Record<PropertyKey, TypedPropertyDescriptor<unknown>>

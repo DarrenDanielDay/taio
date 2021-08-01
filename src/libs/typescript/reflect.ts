@@ -1,5 +1,5 @@
-import type { AnyConstructor, AnyFunc, AnyMethod } from "../types/concepts";
-import type { NonExtensibleObject } from "../types/object";
+import type { AnyConstructor, AnyFunc, AnyMethod } from "../../types/concepts";
+import type { NonExtensibleObject } from "../../types/object";
 import type { ITypedObject } from "./object";
 
 interface ITypedReflect {

@@ -1,6 +1,6 @@
-import type { Getter, Method, MethodKeys, Setter } from "../types/concepts";
-import type { PropertyConfig } from "../utils/object-operation";
-import { overwriteDescriptorConfig } from "../utils/object-operation";
+import type { Getter, Method, MethodKeys, Setter } from "../../types/concepts";
+import type { PropertyConfig } from "../object-operation";
+import { overwriteDescriptorConfig } from "../object-operation";
 import type { ExtractToMethod } from "./typed";
 import { method, property } from "./typed";
 

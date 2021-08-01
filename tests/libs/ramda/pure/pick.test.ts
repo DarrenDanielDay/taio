@@ -1,5 +1,5 @@
-import { typeEqual } from "../../../../src/functions/common";
-import { pick } from "../../../../src/libs/ramda/pure/pick";
+import { typeEqual } from "../../../../src/utils/typed-function";
+import { pick } from "../../../../src/libs/custom/functions/pick";
 
 describe("pick object property by key", () => {
   it("should pick correctly", () => {

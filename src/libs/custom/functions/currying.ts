@@ -3,8 +3,8 @@ import type {
   CutFirst,
   EmptyTuple,
   TupleSlices,
-} from "../../types/array";
-import type { AnyFunc, Func } from "../../types/concepts";
+} from "../../../types/array";
+import type { AnyFunc, Func } from "../../../types/concepts";
 import type { Placeholder } from "./placeholder";
 import { isPlaceholder, _$_ } from "./placeholder";
 

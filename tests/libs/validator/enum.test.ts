@@ -1,6 +1,6 @@
 import { fail } from "assert";
-import { typeEqual } from "../../../src/functions/common";
-import { isEnumNameOf, isEnumOf } from "../../../src/libs/validator/enum";
+import { typeEqual } from "../../../src/utils/typed-function";
+import { isEnumNameOf, isEnumOf } from "../../../src/utils/validator/enum";
 
 describe("enum validator", () => {
   enum Enum {

@@ -1,5 +1,5 @@
-import { typeEqual } from "../../../../src/functions/common";
-import { multiply } from "../../../../src/libs/ramda/pure/multiply";
+import { typeEqual } from "../../../../src/utils/typed-function";
+import { multiply } from "../../../../src/libs/custom/functions/multiply";
 
 describe("Multiply pure function", () => {
   it("should be math logic", () => {

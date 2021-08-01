@@ -1,9 +1,9 @@
-import { TypedReflect } from "../../src/libs/reflect";
+import { TypedReflect } from "../../src/libs/typescript/reflect";
 import {
   createPureTrackerProxyHandler,
   Operation,
   trackExpression,
-} from "../../src/operators/reflect";
+} from "../../src/libs/custom/operators/reflect";
 import type { ConstructorOf, Func } from "../../src/types/concepts";
 
 const mapToType = (track: Operation) => track.type;

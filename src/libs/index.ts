@@ -1,4 +1,3 @@
-export * as Object from "./object";
-export * as Ramda from "./ramda";
-export * as Reflect from "./reflect";
-export * as Validator from "./validator";
+export * as Object from "./typescript/object";
+export * as Reflect from "./typescript/reflect";
+export * as Validator from "../utils/validator";

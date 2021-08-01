@@ -1,4 +1,4 @@
-import { noop, typed } from "../../src/functions/common";
+import { noop, typed } from "../../src/utils/typed-function";
 
 describe("function typed", () => {
   it("should do nothing", () => {

@@ -1,4 +1,4 @@
-import { DoubleMap } from "../../../src/data-structure/map/double-map";
+import { DoubleMap } from "../../../src/libs/custom/data-structure/map/double-map";
 
 describe("double map", () => {
   let doubleMap: DoubleMap<number, number>;

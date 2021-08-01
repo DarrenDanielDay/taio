@@ -3,8 +3,8 @@ import {
   enumValues,
   numberEnumValues,
   stringEnumValues,
-} from "../../src/enums/operation";
-import { typeEqual } from "../../src/functions/common";
+} from "../../src/utils/enum";
+import { typeEqual } from "../../src/utils/typed-function";
 
 describe("enum", () => {
   enum NumberEnum {

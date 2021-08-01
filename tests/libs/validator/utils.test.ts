@@ -1,11 +1,11 @@
-import { typeEqual } from "../../../src/functions/common";
-import { isObject } from "../../../src/libs/validator/object";
+import { typeEqual } from "../../../src/utils/typed-function";
+import { isObject } from "../../../src/utils/validator/object";
 import {
   isNumber,
   isString,
   primitiveOf,
   typeofIs,
-} from "../../../src/libs/validator/primitive";
+} from "../../../src/utils/validator/primitive";
 import {
   optional,
   nullable,
@@ -13,7 +13,7 @@ import {
   stringRecord,
   record,
   defineValidator,
-} from "../../../src/libs/validator/utils";
+} from "../../../src/utils/validator/utils";
 import type { AnyFunc } from "../../../src/types/concepts";
 
 describe("validator utils", () => {

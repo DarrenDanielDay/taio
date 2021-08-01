@@ -1,5 +1,5 @@
-import { typeEqual } from "../../../../src/functions/common";
-import { add } from "../../../../src/libs/ramda/pure/add";
+import { typeEqual } from "../../../../src/utils/typed-function";
+import { add } from "../../../../src/libs/custom/functions/add";
 
 describe("Add pure function", () => {
   it("should be math logic", () => {

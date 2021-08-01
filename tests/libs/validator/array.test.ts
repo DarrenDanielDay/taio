@@ -8,16 +8,16 @@ import {
   isTupleThat,
   isUnionOf,
   isUnionThat,
-} from "../../../src/libs/validator/array";
+} from "../../../src/utils/validator/array";
 import {
   isNumber,
   isString,
   primitiveOf,
-} from "../../../src/libs/validator/primitive";
-import { isObject } from "../../../src/libs/validator/object";
-import { keyOf, typeEqual } from "../../../src/functions/common";
+} from "../../../src/utils/validator/primitive";
+import { isObject } from "../../../src/utils/validator/object";
+import { keyOf, typeEqual } from "../../../src/utils/typed-function";
 import type { Combinations } from "../../../src/types/converts";
-import { is } from "../../../src/libs/validator/utils";
+import { is } from "../../../src/utils/validator/utils";
 
 describe("Array type guard factory", () => {
   it("should test Arrays", () => {

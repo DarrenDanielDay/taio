@@ -1,5 +1,5 @@
-import { Freeze, Sealed } from "../../decorators/limitations";
-import { invalidOperation } from "../../internal/exceptions";
+import { Freeze, Sealed } from "../../../../utils/decorators/limitations";
+import { invalidOperation } from "../../../../utils/internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import type { IStack } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";

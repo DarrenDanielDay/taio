@@ -1,5 +1,9 @@
-import { Freeze, ReadonlyOutside, Sealed } from "../../decorators/limitations";
-import { invalidOperation } from "../../internal/exceptions";
+import {
+  Freeze,
+  ReadonlyOutside,
+  Sealed,
+} from "../../../../utils/decorators/limitations";
+import { invalidOperation } from "../../../../utils/internal/exceptions";
 import { ImmutableIteration, iteration, Modified } from "../common/iterator";
 import type { ILinkedNode, ILinkedList } from "../interfaces/schema";
 

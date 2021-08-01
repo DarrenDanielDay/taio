@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createNoop } from "../functions/common";
-import type { AnyParams } from "../types/array";
-import type { AnyFunc, Func, Method } from "../types/concepts";
+import { createNoop } from "../../../utils/typed-function";
+import type { AnyParams } from "../../../types/array";
+import type { AnyFunc, Func, Method } from "../../../types/concepts";
 
 export type Operation =
   | ApplyOperation<any, any, any, any>

@@ -1,4 +1,4 @@
-import type { Func } from "../../types/concepts";
+import type { Func } from "../../../../types/concepts";
 
 export class DoubleMap<K, V> {
   #keyToValue = new Map<K, V>();

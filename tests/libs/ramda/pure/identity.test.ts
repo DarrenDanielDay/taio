@@ -1,4 +1,4 @@
-import { identity } from "../../../../src/libs/ramda/pure/identity";
+import { identity } from "../../../../src/libs/custom/functions/identity";
 
 describe("Identity pure function", () => {
   it("should be same input", () => {

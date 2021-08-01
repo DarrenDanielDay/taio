@@ -6,7 +6,7 @@ import {
   isString,
   isSymbol,
   isUndefined,
-} from "../../../src/libs/validator/primitive";
+} from "../../../src/utils/validator/primitive";
 
 describe("Primitive type guards", () => {
   it("should guard primitive", () => {

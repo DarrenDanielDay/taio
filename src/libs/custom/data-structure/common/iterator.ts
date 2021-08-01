@@ -1,8 +1,8 @@
-import type { MethodDecoratorContext } from "../../decorators/define";
-import { WrappedMethod } from "../../decorators/define";
-import { ReadonlyOutside } from "../../decorators/limitations";
-import { invalidOperation } from "../../internal/exceptions";
-import type { MethodKeys } from "../../types/concepts";
+import type { MethodDecoratorContext } from "../../../../utils/decorators/define";
+import { WrappedMethod } from "../../../../utils/decorators/define";
+import { ReadonlyOutside } from "../../../../utils/decorators/limitations";
+import { invalidOperation } from "../../../../utils/internal/exceptions";
+import type { MethodKeys } from "../../../../types/concepts";
 import type { IContainer } from "../interfaces/schema";
 
 export const ImmutableIteration = WrappedMethod<

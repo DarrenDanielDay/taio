@@ -1,8 +1,8 @@
-import { DefaultMap } from "../data-structure/map/default-map";
+import { DefaultMap } from "../../libs/custom/data-structure/map/default-map";
 import { invalidOperation } from "../internal/exceptions";
-import type { AnyConstructor } from "../types/concepts";
-import type { PropertyConfig } from "../utils/object-operation";
-import { overwriteDescriptorConfig } from "../utils/object-operation";
+import type { AnyConstructor } from "../../types/concepts";
+import type { PropertyConfig } from "../object-operation";
+import { overwriteDescriptorConfig } from "../object-operation";
 import { cls, property } from "./typed";
 
 export const Sealed = cls<AnyConstructor>((classObject) => {

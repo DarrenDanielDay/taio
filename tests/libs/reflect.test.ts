@@ -1,4 +1,4 @@
-import { TypedReflect } from "../../src/libs/reflect";
+import { TypedReflect } from "../../src/libs/typescript/reflect";
 
 describe("TypedReflect", () => {
   it("should with apply constraints", () => {

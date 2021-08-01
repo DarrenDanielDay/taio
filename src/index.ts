@@ -1,10 +1,7 @@
-export * as Algorithms from "./algorithms";
-export * as DataStructure from "./data-structure";
-export * as Decorators from "./decorators";
-export * as Enums from "./enums";
-export * as Functions from "./functions";
-export * as Internal from "./internal";
+export * as Algorithms from "./libs/custom/algorithms";
+export * as Decorators from "./utils/decorators";
+export * as Internal from "./utils/internal";
 export * as Libs from "./libs";
-export * as Operators from "./operators";
+export * as Operators from "./libs/custom/operators";
 export * as Types from "./types";
 export * as Utils from "./utils";

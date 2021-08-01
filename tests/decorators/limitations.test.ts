@@ -1,4 +1,4 @@
-import { Freeze, Sealed } from "../../src/decorators/limitations";
+import { Freeze, Sealed } from "../../src/utils/decorators/limitations";
 
 describe("sealed decorator", () => {
   it("should throw when trying to instantiate subclass", () => {

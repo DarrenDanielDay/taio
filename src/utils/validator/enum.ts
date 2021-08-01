@@ -1,4 +1,4 @@
-import { enumKeys, enumValues } from "../../enums/operation";
+import { enumKeys, enumValues } from "../enum";
 import type { EnumUnderlayingType, StandardEnum } from "../../types/enum";
 import type { Validator } from "./common";
 
