@@ -27,3 +27,10 @@ export const record =
   (value): value is Record<PropertyKey, T> =>
     isObjectLike(value) &&
     Reflect.ownKeys(value).every((key) => validator(Reflect.get(value, key)));
+export const is =
+  <T>(reference: T): Validator<T> =>
+  (value: unknown): value is T =>
+    Object.is(value, reference);
+export const givenValue = is;
+export const defineValidator = <T>(validator: Validator<T>): Validator<T> =>
+  validator;

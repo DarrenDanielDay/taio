@@ -2,6 +2,7 @@ import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
 import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
 import type { TemplateAllowedTypes } from "./string";
 // To ensure it's always empty, we should use type alias rather than interface.
+// Interface can be merged by other declaration while type alias cannot.
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type EmptyObject = {};
 export type AnyPrototype = object | null;

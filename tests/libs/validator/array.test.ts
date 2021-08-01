@@ -1,4 +1,5 @@
 import {
+  isAnyOf,
   isArrayOf,
   isIntersectionOf,
   isIntersectionThat,
@@ -7,14 +8,19 @@ import {
   isUnionOf,
   isUnionThat,
 } from "../../../src/libs/validator/array";
-import { isNumber, isString } from "../../../src/libs/validator/primitive";
-import { is } from "../../../src/libs/validator/common";
+import {
+  isNumber,
+  isString,
+  primitiveOf,
+} from "../../../src/libs/validator/primitive";
 import { isObject } from "../../../src/libs/validator/object";
-import { typeEqual } from "../../../src/functions/common";
+import { keyOf, typeEqual } from "../../../src/functions/common";
+import type { Combinations } from "../../../src/types/converts";
+import { is } from "../../../src/libs/validator/utils";
 
 describe("Array type guard factory", () => {
   it("should test Arrays", () => {
-    const validator = isArrayOf(isNumber);
+    const validator = isArrayOf(primitiveOf("number"));
     expect(validator([1, 2, 3])).toBe(true);
     expect(validator([])).toBe(true);
     expect(validator([""])).toBe(false);
@@ -22,8 +28,8 @@ describe("Array type guard factory", () => {
 
   it("should test simple tuples", () => {
     const validator = isTupleOf<[number, number, number]>(
-      isNumber,
-      isNumber,
+      primitiveOf("number"),
+      primitiveOf("number"),
       (value): value is number => typeof value === "number"
     );
     expect(validator([])).toBe(false);
@@ -38,8 +44,8 @@ describe("Array type guard factory", () => {
   });
   it("should test complex tuples", () => {
     const validator = isTupleOf<[number, string, 10n]>(
-      isNumber,
-      isString,
+      primitiveOf("number"),
+      primitiveOf("string"),
       is(10n)
     );
     expect(validator([])).toBe(false);
@@ -57,7 +63,10 @@ describe("Array type guard factory", () => {
   });
 
   it("should test union types", () => {
-    const validator = isUnionOf<[string, number]>(isString, isNumber);
+    const validator = isUnionOf<[string, number]>(
+      primitiveOf("string"),
+      primitiveOf("number")
+    );
     expect(validator(1)).toBe(true);
     expect(validator("aa")).toBe(true);
     expect(validator(true)).toBe(false);
@@ -77,8 +86,15 @@ describe("Array type guard factory", () => {
   });
 
   it("should have better type inference with `That` API", () => {
-    const tupleValidator = isTupleThat(isString, isNumber, is(10 as const));
-    const unionValidator = isUnionThat(isString, isNumber);
+    const tupleValidator = isTupleThat(
+      primitiveOf("string"),
+      primitiveOf("number"),
+      is(10 as const)
+    );
+    const unionValidator = isUnionThat(
+      primitiveOf("string"),
+      primitiveOf("number")
+    );
     const intersectionValidator = isIntersectionThat(
       isObject({ a: isNumber }),
       isObject({ b: isString })
@@ -102,5 +118,38 @@ describe("Array type guard factory", () => {
     } else {
       fail();
     }
+  });
+
+  it("should infer union", () => {
+    interface Foo {
+      a: 1;
+      b: 2;
+    }
+    const validator = isAnyOf("1" as const, "2" as const, 3 as const);
+    const value: unknown = 3;
+    if (validator(value)) {
+      expect(typeEqual<"1" | "2" | 3, typeof value>(true));
+    } else {
+      fail();
+    }
+    const keysCombination1 = isAnyOf<Combinations<keyof Foo>>("a", "b");
+    const keysCombination2 = isAnyOf<Combinations<keyof Foo>>("b", "a");
+    isAnyOf<Combinations<keyof Foo>>(
+      // @ts-expect-error Directive as type check
+      "a"
+    );
+    isAnyOf<Combinations<keyof Foo>>(
+      // @ts-expect-error Directive as type check
+      "b"
+    );
+    isAnyOf<Combinations<keyof Foo>>(
+      // @ts-expect-error Directive as type check
+      "a",
+      "b",
+      "c"
+    );
+    expect(
+      keysCombination1(keyOf<Foo>("a")) && keysCombination2(keyOf<Foo>("b"))
+    ).toBe(true);
   });
 });

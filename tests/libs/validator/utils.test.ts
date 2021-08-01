@@ -1,13 +1,20 @@
-import { defineValidator } from "../../../src/libs/validator/common";
+import { typeEqual } from "../../../src/functions/common";
 import { isObject } from "../../../src/libs/validator/object";
-import { isNumber, isString } from "../../../src/libs/validator/primitive";
+import {
+  isNumber,
+  isString,
+  primitiveOf,
+  typeofIs,
+} from "../../../src/libs/validator/primitive";
 import {
   optional,
   nullable,
   nullishOr,
   stringRecord,
   record,
+  defineValidator,
 } from "../../../src/libs/validator/utils";
+import type { AnyFunc } from "../../../src/types/concepts";
 
 describe("validator utils", () => {
   describe("nullish group", () => {
@@ -79,6 +86,26 @@ describe("validator utils", () => {
       const validator = record((v): v is number => fn(v));
       expect(validator(obj)).toBe(true);
       expect(fn).toBeCalledTimes(4);
+    });
+    it("should have all typeof", () => {
+      const validator = typeofIs("function");
+      const fn: unknown = () => 0;
+      if (validator(fn)) {
+        expect(typeEqual<AnyFunc, typeof fn>(true)).toBe(true);
+      } else {
+        fail();
+      }
+    });
+    it("should have primitive only", () => {
+      const validator = primitiveOf("string");
+      // @ts-expect-error Directive as type check
+      primitiveOf("function");
+      const str: unknown = "a";
+      if (validator(str)) {
+        expect(typeEqual<string, typeof str>(true)).toBe(true);
+      } else {
+        fail();
+      }
     });
   });
 });

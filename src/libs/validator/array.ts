@@ -6,6 +6,7 @@ export const isArrayOf =
   <T>(itemValidator: Validator<T>): Validator<T[]> =>
   (value: unknown): value is T[] =>
     Array.isArray(value) && value.every((item) => itemValidator(item));
+export const arrayOf = isArrayOf;
 
 type MapTypesToValidators<Types extends AnyArray> = {
   [K in keyof Types]: Validator<Types[K]>;
@@ -13,6 +14,7 @@ type MapTypesToValidators<Types extends AnyArray> = {
 type MapValidatorsToTypes<Validators extends readonly Validator<unknown>[]> = {
   [K in keyof Validators]: Validators[K] extends Validator<infer T> ? T : never;
 };
+
 export const isTupleOf =
   <Types extends AnyArray>(
     ...validators: MapTypesToValidators<Types>
@@ -21,7 +23,7 @@ export const isTupleOf =
     Array.isArray(value) &&
     value.length === validators.length &&
     validators.every((validator, i) => i in value && validator(value[i]));
-
+export const tupleOf = isTupleOf;
 /**
  * Same logic with `isTupleOf` but different type inference.
  */
@@ -29,6 +31,7 @@ export const isTupleOf =
 export const isTupleThat: <Validators extends readonly Validator<unknown>[]>(
   ...validators: Validators
 ) => Validator<MapValidatorsToTypes<Validators>> = isTupleOf;
+export const tupleThat = isTupleThat;
 
 export const isUnionOf =
   <Types extends AnyArray>(
@@ -36,7 +39,7 @@ export const isUnionOf =
   ): Validator<ArrayItem<Types>> =>
   (value): value is ArrayItem<Types> =>
     validators.some((validator) => validator(value));
-
+export const unionOf = isUnionOf;
 /**
  * Same logic with `isUnionOf` but different type inference.
  */
@@ -44,6 +47,7 @@ export const isUnionOf =
 export const isUnionThat: <Validators extends readonly Validator<unknown>[]>(
   ...validators: Validators
 ) => Validator<ArrayItem<MapValidatorsToTypes<Validators>>> = isUnionOf;
+export const unionThat = isUnionThat;
 
 export const isIntersectionOf =
   <Types extends AnyArray>(
@@ -51,7 +55,7 @@ export const isIntersectionOf =
   ): Validator<UnionToIntersection<ArrayItem<Types>>> =>
   (value): value is UnionToIntersection<ArrayItem<Types>> =>
     validators.every((validator) => validator(value));
-
+export const intersectionOf = isIntersectionOf;
 /**
  * Same logic with `isIntersectionOf` but different type inference.
  */
@@ -62,4 +66,11 @@ export const isIntersectionThat: <
   ...validators: Validators
 ) => Validator<
   UnionToIntersection<ArrayItem<MapValidatorsToTypes<Validators>>>
-> = isUnionOf;
+> = isIntersectionOf;
+export const intersectionThat = isIntersectionThat;
+
+export const isAnyOf =
+  <Types extends AnyArray>(...values: Types): Validator<ArrayItem<Types>> =>
+  (value): value is ArrayItem<Types> =>
+    values.some((enumeration) => Object.is(enumeration, value));
+export const anyOf = isAnyOf;

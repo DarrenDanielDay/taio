@@ -3,6 +3,11 @@ import type { IsEqual } from "../types/converts";
 export function typed<T>(obj: T): T {
   return obj;
 }
+
+export function keyOf<T>(key: keyof T): keyof T {
+  return key;
+}
+
 /**
  * This function is designed just for type testing.
  * @param equality This parameter should be inferred by given generic parameters.

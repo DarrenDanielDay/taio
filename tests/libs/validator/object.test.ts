@@ -1,8 +1,8 @@
 import { typeEqual } from "../../../src/functions/common";
 import { isArrayOf } from "../../../src/libs/validator/array";
-import { defineValidator, is } from "../../../src/libs/validator/common";
 import { isInstanceOf, isObject } from "../../../src/libs/validator/object";
-import { isNumber, isSymbol } from "../../../src/libs/validator/primitive";
+import { isNumber, primitiveOf } from "../../../src/libs/validator/primitive";
+import { defineValidator, is } from "../../../src/libs/validator/utils";
 
 describe("object schema validator", () => {
   it("should test object schema", () => {
@@ -10,7 +10,7 @@ describe("object schema validator", () => {
       isObject({
         a: isNumber,
         b: is("bbb"),
-        c: isArrayOf(isSymbol),
+        c: isArrayOf(primitiveOf("symbol")),
       })
     );
     expect(validator({})).toBe(false);

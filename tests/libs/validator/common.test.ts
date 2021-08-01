@@ -1,4 +1,4 @@
-import { is } from "../../../src/libs/validator/common";
+import { is } from "../../../src/libs/validator/utils";
 
 describe("identity validator", () => {
   it("should only true when same object", () => {
