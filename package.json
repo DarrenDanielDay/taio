@@ -21,9 +21,10 @@
     "url": "https://github.com/DarrenDanielDay/taio"
   },
   "scripts": {
-    "build": "concurrently yarn:build:*",
+    "build": "yarn gene:index && concurrently yarn:build:* && yarn clean:index",
     "build:esm": "tsc --project ./tsconfig.prod.json && yarn esbuild:build",
     "clean": "esbuild ./scripts/clean.ts --format=cjs | node -",
+    "clean:index": "esbuild ./scripts/clean-up-index.ts --format=cjs | node -",
     "dev": "yarn watch",
     "esbuild:build": "esbuild ./scripts/esbuild-bundle.ts --format=cjs | node -",
     "format": "prettier --write .",

@@ -17,17 +17,25 @@ function toPascalCase(kebabCase: string): string {
 
 async function generateIndex(folder: string) {
   const dirs = await fs.readdir(folder);
+  const subModules = dirs.filter((dir) => !dir.endsWith(index));
+  const starredImports = subModules
+    .map((dirOrFile) => {
+      const submoduleName = getModuleName(dirOrFile);
+      return `import * as ${toPascalCase(
+        submoduleName
+      )} from "./${submoduleName}";`;
+    })
+    .join("\n");
+  const moduleNames = `{ ${subModules
+    .map((dirOrFile) => toPascalCase(getModuleName(dirOrFile)))
+    .join(", ")} }`;
+  const namedExports = `export ${moduleNames}`;
+  const defaultExport = `export default ${moduleNames}`;
   await fs.writeFile(
     path.join(folder, index),
-    dirs
-      .filter((dir) => !dir.endsWith(index))
-      .map((dir) => {
-        const submoduleName = dir.replace(suffix, "");
-        return `export * as ${toPascalCase(
-          submoduleName
-        )} from "./${submoduleName}"`;
-      })
-      .join("\n")
+    `${starredImports}
+${namedExports}
+${defaultExport}`
   );
   await Promise.all(
     dirs.map(async (dir) => {
@@ -38,6 +46,10 @@ async function generateIndex(folder: string) {
       }
     })
   );
+
+  function getModuleName(dirOrFile: string) {
+    return dirOrFile.replace(suffix, "");
+  }
 }
 
 main()

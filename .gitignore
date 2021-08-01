@@ -1,6 +1,7 @@
 # For this project
 playground.*
 build
+src/**/index.ts
 ## TypeDoc generated
 *-docs
 
