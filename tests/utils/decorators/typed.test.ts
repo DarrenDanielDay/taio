@@ -1,4 +1,4 @@
-import { parameter } from "../../src/utils/decorators/typed";
+import { parameter } from "../../../src/utils/decorators/typed";
 
 describe("typed decorators", () => {
   it("should decorate parameters", () => {

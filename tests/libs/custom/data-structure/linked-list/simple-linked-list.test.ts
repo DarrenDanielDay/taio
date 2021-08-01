@@ -1,4 +1,4 @@
-import { SimpleLinkedList } from "../../../src/libs/custom/data-structure/linked-list/simple-linked-list";
+import { SimpleLinkedList } from "../../../../../src/libs/custom/data-structure/linked-list/simple-linked-list";
 
 describe("simple linked list", () => {
   it("should be immutable outside", () => {

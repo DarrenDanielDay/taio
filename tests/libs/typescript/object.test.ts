@@ -1,5 +1,5 @@
-import { typeEqual } from "../../src/utils/typed-function";
-import { TypedObject } from "../../src/libs/typescript/object";
+import { typeEqual } from "../../../src/utils/typed-function";
+import { TypedObject } from "../../../src/libs/typescript/object";
 
 describe("typed object", () => {
   it("should be same logic with apis of Object", () => {

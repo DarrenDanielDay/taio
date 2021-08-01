@@ -1,4 +1,4 @@
-import { DefaultMap } from "../../../src/libs/custom/data-structure/map/default-map";
+import { DefaultMap } from "../../../../../src/libs/custom/data-structure/map/default-map";
 
 describe("default map", () => {
   it("should invoke default creator", () => {

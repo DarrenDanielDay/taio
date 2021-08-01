@@ -1,4 +1,4 @@
-import { bfs, dfs } from "../../src/libs/custom/algorithms/search";
+import { bfs, dfs } from "../../../../src/libs/custom/algorithms/search";
 
 describe("search algorithm", () => {
   const jsonTree = {

@@ -2,7 +2,7 @@ import {
   Accesser,
   WrappedMethod,
   DefineProperty,
-} from "../../src/utils/decorators/define";
+} from "../../../src/utils/decorators/define";
 describe("property decorator", () => {
   it("should define on prototype", () => {
     class Foo {

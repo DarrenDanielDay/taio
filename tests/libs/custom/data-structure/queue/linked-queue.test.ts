@@ -1,4 +1,4 @@
-import { LinkedQueue } from "../../../src/libs/custom/data-structure/queue/linked-queue";
+import { LinkedQueue } from "../../../../../src/libs/custom/data-structure/queue/linked-queue";
 
 describe("linked queue", () => {
   it("example: numbers", () => {

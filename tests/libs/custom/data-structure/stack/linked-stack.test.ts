@@ -1,4 +1,4 @@
-import { LinkedStack } from "../../../src/libs/custom/data-structure/stack/linked-stack";
+import { LinkedStack } from "../../../../../src/libs/custom/data-structure/stack/linked-stack";
 
 describe("linked stack", () => {
   it("example: brace matcher", () => {

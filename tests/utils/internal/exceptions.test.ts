@@ -2,7 +2,7 @@ import {
   die,
   illegalState,
   invalidOperation,
-} from "../../src/utils/internal/exceptions";
+} from "../../../src/utils/internal/exceptions";
 
 describe("exception wrappers", () => {
   it("should throw when invoked", () => {
