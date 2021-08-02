@@ -1,4 +1,4 @@
-import type { AnyArray, EmptyTuple } from "./array";
+import type { EmptyTuple } from "./array";
 import type { Digit, EmptyString, ListChar } from "./string";
 
 export type Add<A extends number, B extends number> = [
@@ -13,19 +13,47 @@ export type Multiply<
     ? ListDigitMultiply<ListChar<`${A}`>, ListChar<`${B}`>>["length"]
     : number
   : number;
-type MapDigitToCount<N extends Digit> = {
+export type CountItem = 0;
+export type MapDigitToCount<N extends Digit> = {
   "0": [];
-  "1": [0];
-  "2": [0, 0];
-  "3": [0, 0, 0];
-  "4": [0, 0, 0, 0];
-  "5": [0, 0, 0, 0, 0];
-  "6": [0, 0, 0, 0, 0, 0];
-  "7": [0, 0, 0, 0, 0, 0, 0];
-  "8": [0, 0, 0, 0, 0, 0, 0, 0];
-  "9": [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  "1": [CountItem];
+  "2": [CountItem, CountItem];
+  "3": [CountItem, CountItem, CountItem];
+  "4": [CountItem, CountItem, CountItem, CountItem];
+  "5": [CountItem, CountItem, CountItem, CountItem, CountItem];
+  "6": [CountItem, CountItem, CountItem, CountItem, CountItem, CountItem];
+  "7": [
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem
+  ];
+  "8": [
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem
+  ];
+  "9": [
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem,
+    CountItem
+  ];
 }[N];
-type MultiplyByDigit<N extends Digit, Count extends AnyArray> = {
+export type MultiplyByDigit<N extends Digit, Count extends CountItem[]> = {
   "0": [];
   "1": [...Count];
   "2": [...Count, ...Count];
@@ -56,7 +84,7 @@ type MultiplyByDigit<N extends Digit, Count extends AnyArray> = {
     ...Count
   ];
 }[N];
-type MultiplyTen<Arr extends AnyArray> = [
+export type MultiplyTen<Arr extends CountItem[]> = [
   ...Arr,
   ...Arr,
   ...Arr,
@@ -73,13 +101,13 @@ export type ToCount<N extends string> = N extends EmptyString
   ? EmptyTuple
   : ListChar<N> extends readonly Digit[]
   ? ListDigitToCount<ListChar<N>>
-  : AnyArray;
+  : CountItem[];
 
 export type ListDigitToCount<Digits extends readonly Digit[]> =
   Digits extends readonly [...infer H, infer L]
     ? H extends readonly Digit[]
       ? [...MultiplyTen<ListDigitToCount<H>>, ...MapDigitToCount<Digit & L>]
-      : AnyArray
+      : CountItem[]
     : [];
 
 export type ListDigitMultiply<
@@ -91,5 +119,5 @@ export type ListDigitMultiply<
         ...MultiplyTen<ListDigitMultiply<H, Multiplicand>>,
         ...MultiplyByDigit<Digit & L, ListDigitToCount<Multiplicand>>
       ]
-    : AnyArray
+    : CountItem[]
   : [];
