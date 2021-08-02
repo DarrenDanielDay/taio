@@ -1,6 +1,6 @@
 import type { Nullish } from "../../types/common";
 import { isUnionThat } from "./array";
-import type { Validator } from "./common";
+import type { Assertion, Validator } from "./common";
 import { isObjectLike } from "./object";
 import { isNull, isNullish, isUndefined } from "./primitive";
 
@@ -34,3 +34,8 @@ export const is =
 export const givenValue = is;
 export const defineValidator = <T>(validator: Validator<T>): Validator<T> =>
   validator;
+export const assertThat =
+  <T>(validator: Validator<T>, message?: string): Assertion<T> =>
+  (value) => {
+    if (!validator(value)) throw new TypeError(message ?? "Assertion Failed");
+  };

@@ -6,6 +6,9 @@ export type AnyFunc = Func<AnyParams, any>;
 export type TypeGuard<Union, SubSet extends Union> = (
   obj: Union
 ) => obj is SubSet;
+export type TypeAssertionFunc<Union, Subset extends Union> = (
+  obj: Union
+) => asserts obj is Subset;
 export type Mapper<In, Out> = Func<[In], Out>;
 export type Predicate<T> = Mapper<T, boolean>;
 export type Method<This, Params extends AnyArray, Result> = (

@@ -13,8 +13,10 @@ import {
   stringRecord,
   record,
   defineValidator,
+  assertThat,
 } from "../../../src/utils/validator/utils";
 import type { AnyFunc } from "../../../src/types/concepts";
+import type { Assertion } from "../../../src/utils/validator/common";
 
 describe("validator utils", () => {
   describe("nullish group", () => {
@@ -106,6 +108,26 @@ describe("validator utils", () => {
       } else {
         fail();
       }
+    });
+    it("should have type assertion", () => {
+      const assertion: Assertion<string> = assertThat(isString);
+      const str: unknown = "";
+      const num: unknown = 0;
+      expect(() => {
+        assertion(str);
+        expect(typeof str.slice).toBe("function");
+      }).not.toThrow();
+      expect(() => {
+        assertion(num);
+      }).toThrow(TypeError);
+      const customMessage = "Custom message";
+      expect(() => {
+        const customAssertion: Assertion<string> = assertThat(
+          isNumber,
+          customMessage
+        );
+        customAssertion(str);
+      }).toThrow(customMessage);
     });
   });
 });
