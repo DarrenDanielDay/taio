@@ -32,8 +32,8 @@ export type LastOf<Arr extends AnyArray> = Arr extends EmptyTuple
   ? R
   : never;
 export type TupleSlices<Arr extends AnyArray> = Arr extends EmptyTuple
-  ? EmptyTuple
+  ? []
   : Arr extends readonly [infer First, ...infer Rest]
-  ? EmptyTuple | readonly [First, ...TupleSlices<Rest>]
+  ? [] | [First, ...TupleSlices<Rest>]
   : never;
 export type TupleUnion<Arr extends AnyArray> = Arr[IndexKey<Arr>];

@@ -9,7 +9,7 @@ import type { Placeholder } from "./placeholder";
 import { isPlaceholder, _$_ } from "./placeholder";
 
 type PlaceHoldedParams<P extends AnyArray> = P extends EmptyTuple
-  ? EmptyTuple
+  ? []
   : [P[0] | Placeholder, ...PlaceHoldedParams<CutFirst<P>>];
 type CurryingCall<
   P extends AnyArray,

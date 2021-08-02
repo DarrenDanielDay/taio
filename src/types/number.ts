@@ -1,4 +1,3 @@
-import type { EmptyTuple } from "./array";
 import type { Digit, EmptyString, ListChar } from "./string";
 
 export type Add<A extends number, B extends number> = [
@@ -98,7 +97,7 @@ export type MultiplyTen<Arr extends CountItem[]> = [
 ];
 
 export type ToCount<N extends string> = N extends EmptyString
-  ? EmptyTuple
+  ? []
   : ListChar<N> extends readonly Digit[]
   ? ListDigitToCount<ListChar<N>>
   : CountItem[];
