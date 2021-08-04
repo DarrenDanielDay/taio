@@ -1,4 +1,5 @@
 import type { CutFirst, EmptyTuple } from "./array";
+import type { SubstractCount, ToCount } from "./number";
 
 export type EmptyString = "";
 export type Underline = "_";
@@ -59,13 +60,21 @@ export type UpperCases =
   | "Z";
 export type Chars = LowerCases | UpperCases;
 export type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-
+export type Odds = "1" | "3" | "5" | "7" | "9";
+export type Evens = "0" | "2" | "4" | "6" | "8";
+export type Binary = "0" | "1";
 export type SelectKey<Union extends string, K extends Union> = K;
 
 export type TakeFirst<Str extends string> =
   Str extends `${infer First}${string}` ? First : EmptyString;
 export type TakeRest<Str extends string> = Str extends `${string}${infer Rest}`
   ? Rest
+  : EmptyString;
+export type TakeLast<Str extends string> = ListChar<Str> extends readonly [
+  ...string[],
+  infer Last
+]
+  ? Last
   : EmptyString;
 export type ListChar<Str extends string> = Str extends EmptyString
   ? []
@@ -149,3 +158,37 @@ export type TemplateAllowedTypes =
   | string
   | null
   | undefined;
+
+export type StringLength<Str extends string> = ListChar<Str>["length"];
+
+export type Repeat<Str extends string, N extends number> = Join<
+  Extract<MapTupleToStrings<ToCount<`${N}`>, Str>, readonly string[]>,
+  ""
+>;
+export type MapTupleToStrings<
+  T extends readonly unknown[],
+  Str extends string
+> = {
+  [K in keyof T]: Str;
+};
+
+export type PadStart<
+  Src extends string,
+  Length extends number,
+  Fill extends string = " "
+> = StringLength<Fill> extends 1
+  ? `${Repeat<
+      Fill,
+      SubstractCount<ToCount<`${Length}`>, ToCount<`${StringLength<Src>}`>>
+    >}${Src}`
+  : string;
+export type PadEnd<
+  Src extends string,
+  Length extends number,
+  Fill extends string = " "
+> = StringLength<Fill> extends 1
+  ? `${Src}${Repeat<
+      Fill,
+      SubstractCount<ToCount<`${Length}`>, ToCount<`${StringLength<Src>}`>>
+    >}`
+  : string;
