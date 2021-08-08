@@ -1,7 +1,15 @@
 import { enumKeys, enumValues } from "../enum";
 import type { EnumUnderlayingType, StandardEnum } from "../../types/enum";
 import type { Validator } from "./common";
-
+import { isObjectLike } from "./object";
+import { isNumber, isString } from "./primitive";
+export const isEnumObject = (
+  value: unknown
+): value is StandardEnum<number | string> =>
+  isObjectLike(value) &&
+  Object.entries(value).every(
+    ([k, v]) => isString(v) || (isNumber(v) && Reflect.get(value, v) === k)
+  );
 export const isEnumOf =
   <T extends EnumUnderlayingType>(
     standardEnum: StandardEnum<T>
