@@ -45,7 +45,6 @@ type ConstructFromEntries<
     : never
   : Record<ArrayItem<Entries>[0], ArrayItem<Entries>[1]>;
 
-/** @internal */
 export interface ITypedObject {
   getPrototypeOf<T>(target: T): Partial<T> | null;
   getOwnPropertyDescriptor<T extends object, K extends keyof T>(
