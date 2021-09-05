@@ -12,29 +12,33 @@ describe("enum", () => {
     B = 2,
     C = 3,
   }
+  type NumberEnumUnion = NumberEnum.A | NumberEnum.B | NumberEnum.C;
   enum StringEnum {
     A = "a",
     B = "b",
     C = "c",
   }
+  type StringEnumUnion = StringEnum.A | StringEnum.B | StringEnum.C;
   enum MixedEnum {
     A = "a",
     B = 0,
     C,
   }
+  type MixedEnumUnion = MixedEnum.A | MixedEnum.B | MixedEnum.C;
   it("should get enum values from number enum object", () => {
     const values = enumValues(NumberEnum);
-    expect(typeEqual<NumberEnum[], typeof values>(true)).toBe(true);
+    expect(typeEqual<NumberEnumUnion[], typeof values>(true)).toBe(true);
     expect(values).toEqual([1, 2, 3]);
   });
   it("should get enum values from string enum object", () => {
     const values = enumValues(StringEnum);
-    expect(typeEqual<StringEnum[], typeof values>(true)).toBe(true);
+    expect(typeEqual<StringEnumUnion[], typeof values>(true)).toBe(true);
     expect(values).toEqual(["a", "b", "c"]);
   });
   it("should get enum values from string enum object", () => {
     const values = enumValues<MixedEnum>(MixedEnum);
-    expect(typeEqual<MixedEnum[], typeof values>(true)).toBe(true);
+    // @ts-expect-error TypeScript issue
+    expect(typeEqual<MixedEnumUnion[], typeof values>(true)).toBe(true);
     expect(values).toEqual(["a", 0, 1]);
   });
   it("should get number enum values", () => {
@@ -46,7 +50,7 @@ describe("enum", () => {
   });
   it("should get string enum values", () => {
     const stringEnum = stringEnumValues(StringEnum);
-    expect(typeEqual<StringEnum[], typeof stringEnum>(true)).toBe(true);
+    expect(typeEqual<StringEnumUnion[], typeof stringEnum>(true)).toBe(true);
     // In a mixed enum, we have to use generic params to infer.
     const values = stringEnumValues<MixedEnum>(MixedEnum);
     expect(typeEqual<MixedEnum.A[], typeof values>(true)).toEqual(true);

@@ -15,7 +15,7 @@ describe("enum validator", () => {
     const validator = isEnumOf(Enum);
     const test1: unknown = Enum.A;
     if (validator(test1)) {
-      expect(typeEqual<Enum, typeof test1>(true)).toBe(true);
+      expect(typeEqual<Enum.A | Enum.B, typeof test1>(true)).toBe(true);
     } else {
       fail();
     }

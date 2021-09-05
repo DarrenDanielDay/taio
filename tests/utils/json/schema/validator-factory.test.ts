@@ -69,7 +69,7 @@ describe("createValidatorBySchema", () => {
       enumObject: E,
     });
     const validator = createValidatorBySchema(schema);
-    expect(typeEqual<typeof validator, Validator<E>>(true)).toBe(true);
+    expect(typeEqual<typeof validator, Validator<E.A | E.B>>(true)).toBe(true);
     expect(validator(E.A)).toBe(true);
     expect(validator(E.B)).toBe(true);
     expect(validator(1)).toBe(true);
