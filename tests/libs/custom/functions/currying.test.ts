@@ -1,5 +1,5 @@
-import { currying } from "../../../src/libs/custom/functions/currying";
-import { _$_ } from "../../../src/libs/custom/functions/placeholder";
+import { currying } from "../../../../src/libs/custom/functions/currying";
+import { _$_ } from "../../../../src/libs/custom/functions/placeholder";
 
 describe("Currying", () => {
   it("should be the logic", () => {

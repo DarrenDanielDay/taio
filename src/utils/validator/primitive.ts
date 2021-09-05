@@ -1,7 +1,15 @@
-import type { Nullish, TypeofMapping } from "../../types/common";
+import type {
+  Nullish,
+  PrimitiveTypes,
+  TypeofMapping,
+} from "../../types/common";
 import type { WithoutKey } from "../../types/object";
 import type { Validator } from "./common";
 
+export const isPrimitive: Validator<PrimitiveTypes> = (
+  value
+): value is PrimitiveTypes =>
+  (typeof value !== "object" && typeof value !== "function") || value === null;
 export const isString: Validator<string> = (value): value is string =>
   typeof value === "string";
 export const isNumber: Validator<number> = (value): value is number =>

@@ -3,6 +3,9 @@ import type { EmptyObject } from "../../types/object";
 import type { Validator } from "./common";
 import { isNull } from "./primitive";
 
+export const isObjectOrNull = (value: unknown): value is object | null =>
+  typeof value === "object";
+
 export const isObjectLike = (
   value: unknown
 ): value is Record<PropertyKey, unknown> =>

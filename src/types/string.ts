@@ -1,6 +1,7 @@
 import type { CutFirst, EmptyTuple } from "./array";
 import type { SubstractCount, ToCount } from "./number";
 
+export type ExtractKey<Keys extends PropertyKey, K extends Keys> = K;
 export type EmptyString = "";
 export type Underline = "_";
 export type Hyphen = "-";

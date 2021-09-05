@@ -1,4 +1,5 @@
 import { bfs, dfs } from "../../../../src/libs/custom/algorithms/search";
+import { identity } from "../../../../src/libs/custom/functions/identity";
 
 describe("search algorithm", () => {
   const jsonTree = {
@@ -158,5 +159,21 @@ describe("search algorithm", () => {
       ),
     ];
     expect(count).toBe(2);
+  });
+  it("should skip primitives as circular", () => {
+    expect(() => {
+      const testOn = (fn: typeof dfs) => {
+        const iterator = fn("aaa", (value) => Object.values(value), identity);
+        let current;
+        for (
+          current = iterator.next();
+          !current.done;
+          current = iterator.next()
+        );
+        expect(current.value.circular.size).toBe(0);
+      };
+      testOn(dfs);
+      testOn(bfs);
+    }).not.toThrow();
   });
 });

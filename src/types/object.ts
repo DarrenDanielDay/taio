@@ -25,9 +25,11 @@ export type DeepPartial<T> = T extends AnyArray | PrimitiveTypes
   ? T
   : { [K in keyof T]?: DeepPartial<T[K]> };
 export type AccessPaths<T> = T extends object
-  ? {
-      [K in keyof T]: [K, ...AccessPaths<T[K]>] | [K];
-    }[keyof T]
+  ?
+      | {
+          [K in keyof T]: [K, ...AccessPaths<T[K]>] | [K];
+        }[keyof T]
+      | []
   : [];
 
 export type AccessByPath<
