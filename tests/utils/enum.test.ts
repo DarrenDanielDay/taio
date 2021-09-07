@@ -1,4 +1,5 @@
 import {
+  enumKeyOfValue,
   enumKeys,
   enumValues,
   numberEnumValues,
@@ -62,5 +63,13 @@ describe("enum", () => {
       true
     );
     expect(names).toEqual(["A", "B", "C"]);
+  });
+  it("should get enum name with type constraints", () => {
+    const key1 = enumKeyOfValue(StringEnum, StringEnum.A);
+    const key2 = enumKeyOfValue(NumberEnum, NumberEnum.A);
+    expect(typeEqual<typeof key1, "A" | "B" | "C">(true)).toBe(true);
+    expect(typeEqual<typeof key2, "A" | "B" | "C">(true)).toBe(true);
+    expect(key1).toBe("A");
+    expect(key2).toBe("A");
   });
 });

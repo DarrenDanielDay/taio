@@ -36,3 +36,10 @@ export function enumKeys<T extends StandardEnum<EnumUnderlayingType>>(
     isNaN(+key)
   );
 }
+
+export function enumKeyOfValue<Enum extends StandardEnum<EnumUnderlayingType>>(
+  enumObject: Enum,
+  value: Enum extends StandardEnum<infer E> ? E : never
+): keyof Enum {
+  return Object.entries(enumObject).find(([, val]) => val === value)![0];
+}
