@@ -3532,10 +3532,10 @@ typedoc@^0.21.9:
     shiki "^0.9.8"
     typedoc-default-themes "^0.12.10"
 
-typescript@^4.4.2:
-  version "4.4.2"
-  resolved "https://registry.nlark.com/typescript/download/typescript-4.4.2.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Ftypescript%2Fdownload%2Ftypescript-4.4.2.tgz#6d618640d430e3569a1dfb44f7d7e600ced3ee86"
-  integrity sha1-bWGGQNQw41aaHftE99fmAM7T7oY=
+typescript@^4.5.5:
+  version "4.5.5"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
+  integrity sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==
 
 uglify-js@^3.1.4:
   version "3.14.1"

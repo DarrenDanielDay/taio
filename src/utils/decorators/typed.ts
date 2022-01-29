@@ -5,7 +5,7 @@ import type { AnyPrototype } from "../../types/object";
 export function parameter<
   This,
   Key extends MethodKeys<This>,
-  Index extends IndexKey<Parameters<This[Key]>>
+  Index extends IndexKey<Parameters<Extract<This[Key], AnyMethod>>>
 >(
   decorator: (target: This, key: Key, index: Index) => void
 ): ParameterDecorator {

@@ -1,4 +1,10 @@
-import type { Getter, Method, MethodKeys, Setter } from "../../types/concepts";
+import type {
+  AnyMethod,
+  Getter,
+  Method,
+  MethodKeys,
+  Setter,
+} from "../../types/concepts";
 import type { PropertyConfig } from "../object-operation";
 import { overwriteDescriptorConfig } from "../object-operation";
 import type { ExtractToMethod } from "./typed";
@@ -21,8 +27,11 @@ export interface MethodDecoratorContext<This, Key extends MethodKeys<This>> {
 export function WrappedMethod<This, Key extends MethodKeys<This>>(
   wrapper: Method<
     This,
-    [MethodDecoratorContext<This, Key>, ...Parameters<This[Key]>],
-    ReturnType<This[Key]>
+    [
+      MethodDecoratorContext<This, Key>,
+      ...Parameters<Extract<This[Key], AnyMethod>>
+    ],
+    ReturnType<Extract<This[Key], AnyMethod>>
   >,
   overwrite?: PropertyConfig
 ): MethodDecorator {
