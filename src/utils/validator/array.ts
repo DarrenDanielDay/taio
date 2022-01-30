@@ -3,7 +3,7 @@ import type { MergeAll, UnionToIntersection } from "../../types/converts";
 import type { Validator } from "./common";
 
 export const isArrayOf =
-  <T>(itemValidator: Validator<T>): Validator<T[]> =>
+  <T extends unknown>(itemValidator: Validator<T>): Validator<T[]> =>
   (value: unknown): value is T[] =>
     Array.isArray(value) && value.every((item) => itemValidator(item));
 export const arrayOf = isArrayOf;

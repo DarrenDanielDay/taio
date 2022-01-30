@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "CommonJS"
+  },
+  "extends": "./tsconfig.prod.json",
+  "include": ["src/**/*.ts"]
+}

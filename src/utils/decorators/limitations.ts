@@ -49,7 +49,9 @@ export class Property<This, Key extends keyof This> {
   }
 }
 
-export const ReadonlyOutside = <This>(propConfig?: PropertyConfig) => {
+export const ReadonlyOutside = <This extends object>(
+  propConfig?: PropertyConfig
+) => {
   const propertyMap = new DefaultMap<keyof This, Property<This, keyof This>>(
     () => new Property(undefined!)
   );

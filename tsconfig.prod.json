@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "outDir": "build",
     "emitDeclarationOnly": true
   },
   "extends": "./tsconfig.json",

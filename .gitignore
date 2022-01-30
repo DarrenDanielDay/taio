@@ -1,7 +1,10 @@
 # For this project
 playground.*
 build
+esm
+scripts-build
 src/**/index.ts
+src/**/*.mts
 ## TypeDoc generated
 *-docs
 

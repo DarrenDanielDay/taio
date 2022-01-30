@@ -4,7 +4,7 @@ coverage
 dev-build
 node_modules
 scripts
+scripts-build
 tests
 jest.config.ts
-tsconfig.production.json
 *.log

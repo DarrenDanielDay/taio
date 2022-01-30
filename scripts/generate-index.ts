@@ -1,10 +1,10 @@
-import * as fs from "fs/promises";
-import * as path from "path";
+import { readdir, stat, writeFile } from "fs/promises";
+import { join, parse, resolve } from "path";
 const src = "src";
-const suffix = ".ts";
-const index = "index.ts";
+const index = "index";
+const indexTS = "index.ts";
 async function main() {
-  const srcFolder = path.resolve(process.cwd(), src);
+  const srcFolder = resolve(process.cwd(), src);
   await generateIndex(srcFolder);
 }
 
@@ -16,40 +16,48 @@ function toPascalCase(kebabCase: string): string {
 }
 
 async function generateIndex(folder: string) {
-  const dirs = await fs.readdir(folder);
-  const subModules = dirs.filter((dir) => !dir.endsWith(index));
+  const children = await readdir(folder);
+  const stats = await Promise.all(
+    children.map(async (child) => {
+      const absPath = join(folder, child);
+      const childStat = await stat(absPath);
+      const fileName = parse(child).name;
+      return {
+        stat: childStat,
+        absPath,
+        importName: toPascalCase(fileName),
+        importPath: childStat.isDirectory()
+          ? `./${fileName}/${index}`
+          : `./${fileName}`,
+      };
+    })
+  );
+  const subModules = stats.filter((dir) => !dir.absPath.endsWith(indexTS));
   const starredImports = subModules
-    .map((dirOrFile) => {
-      const submoduleName = getModuleName(dirOrFile);
-      return `import * as ${toPascalCase(
-        submoduleName
-      )} from "./${submoduleName}";`;
+    .map((subModule) => {
+      return `import * as ${subModule.importName} from "${subModule.importPath}";`;
     })
     .join("\n");
   const moduleNames = `{ ${subModules
-    .map((dirOrFile) => toPascalCase(getModuleName(dirOrFile)))
+    .map((subModule) => subModule.importName)
     .join(", ")} }`;
   const namedExports = `export ${moduleNames}`;
   const defaultExport = `export default ${moduleNames}`;
-  await fs.writeFile(
-    path.join(folder, index),
+  await writeFile(
+    join(folder, indexTS),
     `${starredImports}
 ${namedExports}
 ${defaultExport}`
   );
   await Promise.all(
-    dirs.map(async (dir) => {
-      const target = path.join(folder, dir);
-      const stat = await fs.stat(target);
-      if (stat.isDirectory()) {
+    children.map(async (dir) => {
+      const target = join(folder, dir);
+      const targetStat = await stat(target);
+      if (targetStat.isDirectory()) {
         await generateIndex(target);
       }
     })
   );
-
-  function getModuleName(dirOrFile: string) {
-    return dirOrFile.replace(suffix, "");
-  }
 }
 
 main()

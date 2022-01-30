@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "esm",
+    "module": "ESNext"
+  },
+  "extends": "./tsconfig.prod.json",
+  "include": ["src/**/*.mts"]
+}

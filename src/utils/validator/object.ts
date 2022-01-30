@@ -12,9 +12,9 @@ export const isObjectLike = (
   (!isNull(value) && typeof value === "object") || typeof value === "function";
 
 export const isObject =
-  <T extends EmptyObject>(
-    schema: { [K in keyof T]: Validator<T[K]> }
-  ): Validator<T> =>
+  <T extends EmptyObject>(schema: {
+    [K in keyof T]: Validator<T[K]>;
+  }): Validator<T> =>
   (value: unknown): value is T =>
     isObjectLike(value) &&
     Object.entries<Validator<T[keyof T]>>(schema).every(([key, validator]) =>
@@ -22,7 +22,7 @@ export const isObject =
     );
 
 export const isInstanceOf =
-  <T>(constructor: InstanceSource<T>): Validator<T> =>
+  <T extends unknown>(constructor: InstanceSource<T>): Validator<T> =>
   (value): value is T =>
     // @ts-expect-error Symbol.hasInstance is not considered by TypeScript
     value instanceof constructor;
