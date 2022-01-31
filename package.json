@@ -1,6 +1,6 @@
 {
   "name": "taio",
-  "version": "0.5.0-rc",
+  "version": "0.5.0-beta",
   "description": "Typescript All In One",
   "types": "./build/index.d.ts",
   "main": "./build/index.js",
