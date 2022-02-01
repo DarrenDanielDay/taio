@@ -1,26 +1,25 @@
-import { Freeze, Sealed } from "../../../../utils/decorators/limitations";
+import { Freeze } from "../../../../utils/decorators/limitations";
 import { invalidOperation } from "../../../../utils/internal/exceptions";
-import { ImmutableIteration, iteration, Modified } from "../common/iterator";
+import { sealedConstruct } from "../../../../utils/object-operation";
+import { ImmutableIterator } from "../common/iterator";
 import type { IStack } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
-@Freeze
-@Sealed
-class LinkedStack<T> implements IStack<T> {
+export class LinkedStack<T> extends ImmutableIterator<T> implements IStack<T> {
   #linkedList = new SimpleLinkedList<T>();
-  @iteration.modifier
-  readonly $modified!: number;
   get size() {
     return this.#linkedList.size;
   }
-  @ImmutableIteration
-  *[Symbol.iterator](): Iterator<T, void> {
+  constructor() {
+    super();
+    sealedConstruct(LinkedStack, new.target);
+  }
+  protected *getIterator(): Iterator<T, void> {
     yield* this.#linkedList;
   }
-  @Modified
   push(value: T) {
     this.#linkedList.addFirst(value);
+    this.markAsChanged();
   }
-  @Modified
   pop() {
     const currentSize = this.size;
     if (currentSize === 0) {
@@ -28,6 +27,7 @@ class LinkedStack<T> implements IStack<T> {
     }
     const { value } = this.#linkedList.head!;
     this.#linkedList.removeFirst();
+    this.markAsChanged();
     return value;
   }
   get top() {
@@ -36,9 +36,9 @@ class LinkedStack<T> implements IStack<T> {
     }
     return this.#linkedList.head!.value;
   }
-  @Modified
   clear() {
     this.#linkedList.clear();
+    this.markAsChanged();
   }
 
   clone() {
@@ -48,4 +48,4 @@ class LinkedStack<T> implements IStack<T> {
   }
 }
 
-export { LinkedStack };
+Freeze(LinkedStack);

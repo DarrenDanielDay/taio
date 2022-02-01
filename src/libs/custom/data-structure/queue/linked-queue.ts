@@ -1,25 +1,25 @@
-import { Freeze, Sealed } from "../../../../utils/decorators/limitations";
+import { Freeze } from "../../../../utils/decorators/limitations";
 import { invalidOperation } from "../../../../utils/internal/exceptions";
-import { iteration, Modified } from "../common/iterator";
+import { sealedConstruct } from "../../../../utils/object-operation";
+import { ImmutableIterator } from "../common/iterator";
 import type { IQueue } from "../interfaces/schema";
 import { SimpleLinkedList } from "../linked-list/simple-linked-list";
-@Freeze
-@Sealed
-class LinkedQueue<T> implements IQueue<T> {
+export class LinkedQueue<T> extends ImmutableIterator<T> implements IQueue<T> {
   #linkedList = new SimpleLinkedList<T>();
-  @iteration.modifier
-  readonly $modified!: number;
   get size() {
     return this.#linkedList.size;
   }
-  *[Symbol.iterator](): Iterator<T, void> {
+  constructor() {
+    super();
+    sealedConstruct(LinkedQueue, new.target);
+  }
+  protected *getIterator(): Iterator<T, void> {
     yield* this.#linkedList;
   }
-  @Modified
   enqueue(value: T): void {
     this.#linkedList.addLast(value);
+    this.markAsChanged();
   }
-  @Modified
   dequeue(): T {
     const currentSize = this.size;
     if (currentSize === 0) {
@@ -27,6 +27,7 @@ class LinkedQueue<T> implements IQueue<T> {
     }
     const { value } = this.#linkedList.head!;
     this.#linkedList.removeFirst();
+    this.markAsChanged();
     return value;
   }
   get front(): T {
@@ -41,9 +42,9 @@ class LinkedQueue<T> implements IQueue<T> {
     }
     return this.#linkedList.tail!.value;
   }
-  @Modified
   clear() {
     this.#linkedList.clear();
+    this.markAsChanged();
   }
 
   clone() {
@@ -52,5 +53,4 @@ class LinkedQueue<T> implements IQueue<T> {
     return newQueue;
   }
 }
-
-export { LinkedQueue };
+Freeze(LinkedQueue);

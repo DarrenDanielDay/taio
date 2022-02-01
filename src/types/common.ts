@@ -1,5 +1,5 @@
 import type { AnyFunc } from "./concepts";
-import type { WithoutKey } from "./object";
+import type { OmitKey } from "./object";
 
 export type PrimitiveTypes =
   | bigint
@@ -19,8 +19,7 @@ export interface PrimitiveTypeMapping {
   symbol: symbol;
   bigint: bigint;
 }
-export interface TypeofMapping
-  extends WithoutKey<PrimitiveTypeMapping, "null"> {
+export interface TypeofMapping extends OmitKey<PrimitiveTypeMapping, "null"> {
   function: AnyFunc;
   object: object;
 }

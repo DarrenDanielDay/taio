@@ -6,9 +6,7 @@ import type { Multiply } from "../../../types/number";
  * @param b number b
  * @returns a * b
  */
-export function multiply<A extends number, B extends number>(
+export const multiply = <A extends number, B extends number>(
   a: A,
   b: B
-): Multiply<A, B> {
-  return +a * +b;
-}
+): Multiply<A, B> => a * b;

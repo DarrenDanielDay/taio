@@ -14,9 +14,9 @@ import type {
   JSONSchema,
 } from "../interfaces/json-describer";
 
-function _createValidatorBySchema<Schema extends JSONSchema>(
+const internalCreateValidatorBySchema = <Schema extends JSONSchema>(
   schema: Schema
-): Validator<CreateTypeBySchemaType<Schema>> {
+): Validator<CreateTypeBySchemaType<Schema>> => {
   if (schema.type === "object") {
     type T = CreateObjectTypeBySchema<Extract<typeof schema, JSONObjectSchema>>;
     const entries = TypedObject.entries(schema.fields);
@@ -25,7 +25,7 @@ function _createValidatorBySchema<Schema extends JSONSchema>(
     };
     const obj = entries.reduce<Partial<ValidatorOfT>>(
       (acc, [key, subschema]) => {
-        Reflect.set(acc, key, _createValidatorBySchema(subschema));
+        Reflect.set(acc, key, internalCreateValidatorBySchema(subschema));
         return acc;
       },
       {}
@@ -35,11 +35,11 @@ function _createValidatorBySchema<Schema extends JSONSchema>(
   }
   if (schema.type === "array") {
     // @ts-expect-error Dynamic impl
-    return isArrayOf(_createValidatorBySchema(schema.item));
+    return isArrayOf(internalCreateValidatorBySchema(schema.item));
   }
   if (schema.type === "tuple") {
     // @ts-expect-error Dynamic impl
-    return isTupleOf(...schema.items.map(_createValidatorBySchema));
+    return isTupleOf(...schema.items.map(internalCreateValidatorBySchema));
   }
   if (schema.type === "enum") {
     // @ts-expect-error Dynamic impl
@@ -54,17 +54,17 @@ function _createValidatorBySchema<Schema extends JSONSchema>(
     return is(schema.value);
   }
   if (schema.type === "union") {
-    return isUnionOf(...schema.unions.map(_createValidatorBySchema));
+    return isUnionOf(...schema.unions.map(internalCreateValidatorBySchema));
   }
   // @ts-expect-error Dynamic impl
   return primitiveOf(schema.type);
-}
+};
 
-export function createValidatorBySchema<Schema extends JSONSchema>(
+export const createValidatorBySchema = <Schema extends JSONSchema>(
   schema: Schema
-): Validator<CreateTypeBySchemaType<Schema>> {
+): Validator<CreateTypeBySchemaType<Schema>> => {
   if (!isJSONLike(schema)) {
     return die("Invalid JSON Schema.");
   }
-  return _createValidatorBySchema(schema);
-}
+  return internalCreateValidatorBySchema(schema);
+};

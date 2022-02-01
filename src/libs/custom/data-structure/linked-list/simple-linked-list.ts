@@ -1,139 +1,137 @@
-import {
-  Freeze,
-  ReadonlyOutside,
-  Sealed,
-} from "../../../../utils/decorators/limitations";
+import { Freeze } from "../../../../utils/decorators/limitations";
 import { invalidOperation } from "../../../../utils/internal/exceptions";
-import { ImmutableIteration, iteration, Modified } from "../common/iterator";
+import { sealedConstruct } from "../../../../utils/object-operation";
+import { TypedReflect } from "../../../typescript/reflect";
+import { ImmutableIterator } from "../common/iterator";
 import type { ILinkedNode, ILinkedList } from "../interfaces/schema";
-
-const readonly = ReadonlyOutside<SimpleLinkedList<unknown>>({
-  enumerable: true,
-});
-
-@Freeze
-@Sealed
-class SimpleLinkedList<T> implements ILinkedList<T> {
-  @iteration.modifier
-  readonly $modified!: number;
-  @readonly.decorate<"head">(undefined)
-  readonly head: ILinkedNode<T> | undefined;
-  @readonly.decorate<"tail">(undefined)
-  readonly tail: ILinkedNode<T> | undefined;
-  @readonly.decorate<"size">(0)
-  readonly size!: number;
-  @ImmutableIteration
-  *[Symbol.iterator](this: SimpleLinkedList<T>): Iterator<T, void> {
+export class SimpleLinkedList<T>
+  extends ImmutableIterator<T>
+  implements ILinkedList<T>
+{
+  #head: ILinkedNode<T> | undefined;
+  get head() {
+    return this.#head;
+  }
+  #tail: ILinkedNode<T> | undefined;
+  get tail() {
+    return this.#tail;
+  }
+  #size = 0;
+  get size() {
+    return this.#size;
+  }
+  constructor() {
+    super();
+    sealedConstruct(SimpleLinkedList, new.target);
+  }
+  protected *getIterator(): Iterator<T, void> {
     let node = this.head;
     while (node) {
       yield node.value;
       node = node.next;
     }
   }
-  @Modified
   addBefore(node: ILinkedNode<T>, value: T) {
     const { previous } = node;
-    const newNode: ILinkedNode<T> = {
+    const newNode: ILinkedNode<T> = this.#createNode({
       previous,
       value,
       next: node,
-    };
+    });
     if (node === this.head) {
-      readonly.set(this, "head", newNode);
+      this.#head = newNode;
     }
-    node.previous = newNode;
+    TypedReflect.set(node, "previous", newNode);
     if (previous) {
-      previous.next = newNode;
+      TypedReflect.set(previous, "next", newNode);
     }
-    readonly.set(this, "size", this.size + 1);
+    this.#size++;
+    this.markAsChanged();
   }
-  @Modified
   addAfter(node: ILinkedNode<T>, value: T) {
     const { next } = node;
-    const newNode: ILinkedNode<T> = {
+    const newNode: ILinkedNode<T> = this.#createNode({
       previous: node,
       value,
       next,
-    };
+    });
     if (node === this.tail) {
-      readonly.set(this, "tail", newNode);
+      this.#tail = newNode;
     }
-    node.next = newNode;
+    TypedReflect.set(node, "next", newNode);
     if (next) {
-      next.previous = newNode;
+      TypedReflect.set(next, "previous", newNode);
     }
-    readonly.set(this, "size", this.size + 1);
+    this.#size++;
+    this.markAsChanged();
   }
-  @Modified
   addLast(value: T): void {
-    if (!this.head) {
-      const node = {
+    if (!this.head || !this.tail) {
+      const newNode = this.#createNode({
         previous: undefined,
         value,
         next: undefined,
-      };
-      readonly.set(this, "head", node);
-      readonly.set(this, "tail", node);
+      });
+      this.#head = this.#tail = newNode;
     } else {
-      const newNode = {
+      const newNode = this.#createNode({
         previous: this.tail,
         value,
         next: undefined,
-      };
-      this.tail!.next = newNode;
-      readonly.set(this, "tail", newNode);
+      });
+      TypedReflect.set(this.tail, "next", newNode);
+      this.#tail = newNode;
     }
-    readonly.set(this, "size", this.size + 1);
+    this.#size++;
+    this.markAsChanged();
   }
-  @Modified
+
   addFirst(value: T): void {
-    if (!this.tail) {
-      const node = {
+    if (!this.tail || !this.head) {
+      const newNode = this.#createNode({
         previous: undefined,
         value,
         next: undefined,
-      };
-      readonly.set(this, "head", node);
-      readonly.set(this, "tail", node);
+      });
+      this.#head = this.#tail = newNode;
     } else {
-      const newNode = {
+      const newNode = this.#createNode({
         previous: undefined,
         value,
         next: this.head,
-      };
-      this.head!.previous = newNode;
-      readonly.set(this, "head", newNode);
+      });
+      TypedReflect.set(this.head, "previous", newNode);
+      this.#head = newNode;
     }
-    readonly.set(this, "size", this.size + 1);
+    this.#size++;
+    this.markAsChanged();
   }
-  @Modified
   remove(node: ILinkedNode<T>): void {
     const currentSize = this.size;
     if (currentSize === 0) {
       return invalidOperation("LinkedList is empty.");
     }
     if (node === this.head) {
-      readonly.set(this, "head", node.next);
+      this.#head = node.next;
     }
     if (node === this.tail) {
-      readonly.set(this, "tail", node.previous);
+      this.#tail = node.previous;
     }
     if (node.next) {
-      node.next.previous = undefined;
+      TypedReflect.set(node.next, "previous", undefined);
     }
     if (node.previous) {
-      node.previous.next = undefined;
+      TypedReflect.set(node.previous, "next", undefined);
     }
-    readonly.set(this, "size", currentSize - 1);
+    this.#size--;
+    this.markAsChanged();
   }
-  @Modified
   removeFirst() {
     if (this.size === 0) {
       return invalidOperation("LinkedList is empty");
     }
     return this.remove(this.head!);
   }
-  @Modified
   removeLast() {
     if (this.size === 0) {
       return invalidOperation("LinkedList is empty");
@@ -156,11 +154,10 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
     }
     return undefined;
   }
-  @Modified
   clear() {
-    readonly.set(this, "head", undefined);
-    readonly.set(this, "tail", undefined);
-    readonly.set(this, "size", 0);
+    this.#head = this.#tail = undefined;
+    this.#size = 0;
+    this.markAsChanged();
   }
   clone() {
     const newList = new SimpleLinkedList<T>();
@@ -169,6 +166,8 @@ class SimpleLinkedList<T> implements ILinkedList<T> {
     }
     return newList;
   }
+  #createNode(node: ILinkedNode<T>) {
+    return Object.preventExtensions(node);
+  }
 }
-
-export { SimpleLinkedList };
+Freeze(SimpleLinkedList);

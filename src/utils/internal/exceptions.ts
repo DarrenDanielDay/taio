@@ -1,11 +1,12 @@
-export function die(message?: string): never {
+export const die = (message?: string): never => {
   throw new Error(message);
-}
+};
 
-export function invalidOperation(message?: string) {
-  return die(`Invalid Operation: ${message}`);
-}
+export const invalidOperation = (message?: string) =>
+  die(`Invalid Operation: ${message}`);
 
-export function illegalState(message?: string) {
-  return die(`Illegal State: ${message}`);
-}
+export const constructAbstractClass = (name: string) =>
+  invalidOperation(`Cannot instantiate abstract class '${name}'`);
+
+export const illegalState = (message?: string) =>
+  die(`Illegal State: ${message}`);

@@ -5,7 +5,7 @@ name: Node.js CI
 
 on:
   push:
-    tags: 
+    tags:
       - "v*"
 
 jobs:
@@ -47,4 +47,3 @@ jobs:
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
-

@@ -3,7 +3,7 @@ import type {
   PrimitiveTypes,
   TypeofMapping,
 } from "../../types/common";
-import type { WithoutKey } from "../../types/object";
+import type { OmitKey } from "../../types/object";
 import type { Validator } from "./common";
 
 export const isPrimitive: Validator<PrimitiveTypes> = (
@@ -25,10 +25,7 @@ export const isUndefined: Validator<undefined> = (value): value is undefined =>
 export const isNull: Validator<null> = (value): value is null => value === null;
 export const isNullish: Validator<Nullish> = (value): value is Nullish =>
   value == null;
-type PrimitiveOnlyTypeofMapping = WithoutKey<
-  TypeofMapping,
-  "function" | "object"
->;
+type PrimitiveOnlyTypeofMapping = OmitKey<TypeofMapping, "function" | "object">;
 
 export const typeofIs =
   <K extends keyof TypeofMapping>(typeName: K): Validator<TypeofMapping[K]> =>

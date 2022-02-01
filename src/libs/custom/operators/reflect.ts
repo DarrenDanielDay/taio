@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createNoop } from "../../../utils/typed-function";
+import { createProxyHost } from "../../../utils/typed-function";
 import type { AnyParams } from "../../../types/array";
 import type { AnyFunc, Func, Method } from "../../../types/concepts";
 
@@ -116,9 +116,9 @@ export interface SetPrototypeOfOperation<T, P> extends BaseOperation<T> {
   result: boolean;
 }
 
-export function createPureTrackerProxyHandler<T extends object>(
+export const createPureTrackerProxyHandler = <T extends object>(
   tracks: Operation[]
-): Required<ProxyHandler<T>> {
+): Required<ProxyHandler<T>> => {
   const proxyHandler: Required<ProxyHandler<AnyFunc>> = {
     apply(target, thisArg, argArray) {
       const result = Reflect.apply(target, thisArg, argArray);
@@ -194,14 +194,14 @@ export function createPureTrackerProxyHandler<T extends object>(
   };
   // @ts-expect-error Skipped type check because [[Target]] is a function
   return proxyHandler;
-}
+};
 
-export function createExpressionAnalyser(
+export const createExpressionAnalyser = (
   tracks: Operation[]
-): ProxyHandler<object> {
+): ProxyHandler<object> => {
   let wrapped: AnyFunc | undefined;
   const wrapResultWithProxy = () => {
-    wrapped = wrapped ?? new Proxy<AnyFunc>(createNoop(), proxyHandler);
+    wrapped = wrapped ?? new Proxy<AnyFunc>(createProxyHost(), proxyHandler);
     return wrapped;
   };
   const pureHandler = createPureTrackerProxyHandler(tracks);
@@ -261,11 +261,11 @@ export function createExpressionAnalyser(
     },
   };
   return proxyHandler;
-}
+};
 
-export function trackExpression<T, R>(expression: (input: T) => R) {
+export const trackExpression = <T, R>(expression: (input: T) => R) => {
   const track: Operation[] = [];
   const handler = createExpressionAnalyser(track);
-  Reflect.apply(expression, undefined, [new Proxy(createNoop(), handler)]);
+  Reflect.apply(expression, undefined, [new Proxy(createProxyHost(), handler)]);
   return track;
-}
+};

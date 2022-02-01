@@ -1,17 +1,15 @@
+import { identity } from "../../libs/custom/functions/identity";
 import type { AnyMethod, Method, MethodKeys } from "../../types/concepts";
 import type { IndexKey } from "../../types/converts";
 import type { AnyPrototype } from "../../types/object";
-
-export function parameter<
+// @ts-expect-error Contravariance
+export const parameter: <
   This,
   Key extends MethodKeys<This>,
   Index extends IndexKey<Parameters<Extract<This[Key], AnyMethod>>>
 >(
   decorator: (target: This, key: Key, index: Index) => void
-): ParameterDecorator {
-  // @ts-expect-error Contravariance
-  return decorator;
-}
+) => ParameterDecorator = identity;
 
 export type ExtractToMethod<
   This,
@@ -20,27 +18,21 @@ export type ExtractToMethod<
   ? Method<This, Parameters<This[Key]>, ReturnType<This[Key]>>
   : never;
 
-export function method<This, Key extends MethodKeys<This>>(
+// @ts-expect-error Contravariance
+export const method: <This, Key extends MethodKeys<This>>(
   decorator: (
     target: This,
     key: Key,
     descriptor: TypedPropertyDescriptor<ExtractToMethod<This, Key>>
   ) => TypedPropertyDescriptor<ExtractToMethod<This, Key>> | void
-): MethodDecorator {
-  // @ts-expect-error Contravariance
-  return decorator;
-}
+) => MethodDecorator = identity;
 
-export function property<This, Key extends keyof This>(
+// @ts-expect-error Contravariance
+export const property: <This, Key extends keyof This>(
   decorator: (target: This, key: Key) => void
-): PropertyDecorator {
-  // @ts-expect-error Contravariance
-  return decorator;
-}
+) => PropertyDecorator = identity;
 
-export function cls<Class extends AnyPrototype>(
+// @ts-expect-error Contravariance
+export const cls: <Class extends AnyPrototype>(
   decorator: (cls: Class) => Class | void
-): ClassDecorator {
-  // @ts-expect-error Contravariance
-  return decorator;
-}
+) => ClassDecorator = identity;

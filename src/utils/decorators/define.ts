@@ -10,13 +10,12 @@ import { overwriteDescriptorConfig } from "../object-operation";
 import type { ExtractToMethod } from "./typed";
 import { method, property } from "./typed";
 
-export function DefineProperty<T>(
+export const DefineProperty = <T extends unknown>(
   descriptor: TypedPropertyDescriptor<T>
-): PropertyDecorator {
-  return property((target, key) => {
+): PropertyDecorator =>
+  property((target, key) => {
     Object.defineProperty(target, key, descriptor);
   });
-}
 
 export interface MethodDecoratorContext<This, Key extends MethodKeys<This>> {
   target: This;
@@ -24,7 +23,7 @@ export interface MethodDecoratorContext<This, Key extends MethodKeys<This>> {
   func: ExtractToMethod<This, Key>;
 }
 
-export function WrappedMethod<This, Key extends MethodKeys<This>>(
+export const WrappedMethod = <This, Key extends MethodKeys<This>>(
   wrapper: Method<
     This,
     [
@@ -34,8 +33,8 @@ export function WrappedMethod<This, Key extends MethodKeys<This>>(
     ReturnType<Extract<This[Key], AnyMethod>>
   >,
   overwrite?: PropertyConfig
-): MethodDecorator {
-  return method<This, Key>((target, methodName, descriptor) => {
+): MethodDecorator =>
+  method<This, Key>((target, methodName, descriptor) => {
     const originalMethod = descriptor.value;
     // @ts-expect-error Conditional type
     descriptor.value = function (this: This, ...args: Parameters<This[Key]>) {
@@ -47,7 +46,6 @@ export function WrappedMethod<This, Key extends MethodKeys<This>>(
     overwriteDescriptorConfig(overwrite, descriptor);
     return descriptor;
   });
-}
 
 export interface Accessors<This, T> {
   get: Getter<This, T>;
@@ -64,7 +62,7 @@ export interface AccessorContext<
   name: Key;
 }
 
-export function Accesser<
+export const Accesser = <
   This,
   Key extends keyof This,
   Type extends keyof Accessors<This, This[Key]>
@@ -79,8 +77,8 @@ export function Accesser<
     ReturnType<Accessors<This, This[Key]>[Type]>
   >,
   overwrite?: PropertyConfig
-): MethodDecorator {
-  return method(
+): MethodDecorator =>
+  method(
     // @ts-expect-error Contravariance
     (target: This, key: Key, describer: TypedPropertyDescriptor<This[Key]>) => {
       const originalAccessor = describer[type]!;
@@ -100,4 +98,3 @@ export function Accesser<
       return describer;
     }
   );
-}

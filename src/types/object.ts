@@ -6,7 +6,7 @@ import type { TemplateAllowedTypes } from "./string";
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type EmptyObject = {};
 export type AnyPrototype = object | null;
-export type WithoutKey<T, K extends keyof T> = Omit<T, K>;
+export type OmitKey<T, K extends keyof T> = Omit<T, K>;
 export type DeepReadonly<T> = T extends PrimitiveTypes
   ? T
   : T extends AnyArray

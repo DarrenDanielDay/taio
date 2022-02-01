@@ -1,7 +1,6 @@
+import { identity } from "../../../libs/custom/functions/identity";
 import type { JSONSchema } from "../interfaces/json-describer";
 
-export function defineSchema<Schema extends JSONSchema>(
+export const defineSchema: <Schema extends JSONSchema>(
   schema: Schema
-): Schema {
-  return schema;
-}
+) => Schema = identity;

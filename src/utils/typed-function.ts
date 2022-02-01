@@ -1,32 +1,28 @@
+import { identity } from "../libs/custom/functions/identity";
 import type { IsEqual } from "../types/converts";
 
-export function typed<T>(obj: T): T {
-  return obj;
-}
-
-export function keyOf<T>(key: keyof T): keyof T {
-  return key;
-}
+export const keyOf: <T>(key: keyof T) => keyof T = identity;
 
 /**
  * This function is designed just for type testing.
  * @param equality This parameter should be inferred by given generic parameters.
  * @returns equality
  */
-export function typeEqual<A, B>(equality: IsEqual<A, B>): IsEqual<A, B> {
-  return equality;
-}
+export const typeEqual: <A, B>(equality: IsEqual<A, B>) => IsEqual<A, B> =
+  identity;
 
-export function noop() {
+export const noop = () => {
   /**
    * Do nothing.
    */
-}
+};
 
-export function createNoop() {
-  return function noop() {
+/**
+ * @internal
+ */
+export const createProxyHost = () =>
+  function noop() {
     /**
      * Do nothing.
      */
   };
-}

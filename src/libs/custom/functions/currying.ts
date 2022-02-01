@@ -33,8 +33,9 @@ type Currying<P extends AnyArray, R> = <
   ...args: Args
 ) => CurryingCall<P, R, Args>;
 
-function _currying(fn: AnyFunc, passed: unknown[]) {
-  return (...args: unknown[]) => {
+const internalCurrying =
+  (fn: AnyFunc, passed: unknown[]) =>
+  (...args: unknown[]) => {
     const newPassed = passed.slice();
     const toFill: number[] = [];
     for (let i = 0; i < passed.length; i++) {
@@ -52,17 +53,16 @@ function _currying(fn: AnyFunc, passed: unknown[]) {
     if (newPassed.every((param) => !isPlaceholder(param))) {
       return fn(...newPassed);
     } else {
-      return _currying(fn, newPassed);
+      return internalCurrying(fn, newPassed);
     }
   };
-}
 
-export function currying<P extends AnyArray, R>(
+export const currying = <P extends AnyArray, R>(
   fn: Func<P, R>,
   count?: P["length"]
-): Currying<P, R> {
+): Currying<P, R> => {
   count = count ?? fn.length;
   const passed: unknown[] = new Array(count).fill(_$_);
   // @ts-expect-error Implementation detail
-  return _currying(fn, passed);
-}
+  return internalCurrying(fn, passed);
+};

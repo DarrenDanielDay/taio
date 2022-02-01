@@ -3,6 +3,4 @@
  * @param obj input object
  * @returns obj
  */
-export function identity<T>(obj: T): T {
-  return obj;
-}
+export const identity = <T extends unknown>(obj: T): T => obj;

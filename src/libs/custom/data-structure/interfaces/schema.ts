@@ -1,9 +1,5 @@
 export interface IContainer<T> extends Iterable<T> {
   /**
-   * The times that the container has been modified.
-   */
-  readonly $modified: number;
-  /**
    * The number of elements in the container.
    */
   readonly size: number;
@@ -37,9 +33,9 @@ export interface ICollection<T> extends IContainer<T> {
 }
 
 export interface ILinkedNode<T> {
-  value: T;
-  next: ILinkedNode<T> | undefined;
-  previous: ILinkedNode<T> | undefined;
+  readonly value: T;
+  readonly next: ILinkedNode<T> | undefined;
+  readonly previous: ILinkedNode<T> | undefined;
 }
 
 export interface ILinkedList<T> extends IContainer<T> {

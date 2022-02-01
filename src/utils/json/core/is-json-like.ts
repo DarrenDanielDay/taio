@@ -1,6 +1,6 @@
 import { dfs } from "../../../libs/custom/algorithms/search";
+import { identity } from "../../../libs/custom/functions/identity";
 import type { ExtractKey } from "../../../types/string";
-import { typed } from "../../typed-function";
 import { isUnionOf } from "../../validator/array";
 import type { Assertion } from "../../validator/common";
 import { isObjectLike, isObjectOrNull } from "../../validator/object";
@@ -26,7 +26,7 @@ export const isJSONPrimitive = isUnionOf(
   isNullish
 );
 
-export function isJSONLike(value: unknown): boolean {
+export const isJSONLike = (value: unknown): boolean => {
   if (isPrimitive(value)) {
     return true;
   }
@@ -76,36 +76,36 @@ export function isJSONLike(value: unknown): boolean {
     }
   }
   return current.value.circular.size === 0;
-}
+};
 
-function hasPrototype(value: unknown, constructor: Function | null): boolean {
+const hasPrototype = (
+  value: unknown,
+  constructor: Function | null
+): boolean => {
   const valuePrototype: unknown = Object.getPrototypeOf(value);
   assertTypeofIsObject(valuePrototype);
   return (
     (valuePrototype === null && constructor === null) ||
     valuePrototype?.constructor === constructor
   );
-}
+};
 
 /**
  * Test whether an object has custom prototype
  * @param value The value to be tested
  * @returns whether `value` has custom prototype
  */
-export function isPureObject(value: unknown): boolean {
-  if (typeof value !== "object" || value === null) return false;
-  return hasPrototype(value, Object) || hasPrototype(value, null);
-}
+export const isPureObject = (value: unknown): boolean =>
+  typeof value !== "object" || value === null
+    ? false
+    : hasPrototype(value, Object) || hasPrototype(value, null);
 
-export function isPureArray(value: unknown): boolean {
-  return (
-    Array.isArray(value) &&
-    hasPrototype(value, Array) &&
-    Object.getOwnPropertyNames(value).every(
-      (key) =>
-        (key === typed<ExtractKey<keyof unknown[], "length">>("length") &&
-          isNumber(value[key])) ||
-        (key !== "" && [...key].every((char) => +char === +char))
-    )
+export const isPureArray = (value: unknown): boolean =>
+  Array.isArray(value) &&
+  hasPrototype(value, Array) &&
+  Object.getOwnPropertyNames(value).every(
+    (key) =>
+      (key === identity<ExtractKey<keyof unknown[], "length">>("length") &&
+        isNumber(value[key])) ||
+      (key !== "" && [...key].every((char) => +char === +char))
   );
-}

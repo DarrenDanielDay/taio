@@ -1,11 +1,4 @@
-import { noop, typed } from "../../src/utils/typed-function";
-
-describe("function typed", () => {
-  it("should do nothing", () => {
-    const symbol = Symbol();
-    expect(typed<symbol>(symbol)).toBe(symbol);
-  });
-});
+import { noop } from "../../src/utils/typed-function";
 
 describe("function noop", () => {
   it("should do nothing", () => {
