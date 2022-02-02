@@ -16,6 +16,10 @@ export type ToBinary<Literal extends string> = Literal extends EmptyString
   ? Literal
   : `${ToBinary<DivideByTwo<Literal>>}${ModTwo<Literal>}`;
 export type MaxBinaryOperationLength = 15;
+export type BNot<
+  N extends number,
+  Length extends number = MaxBinaryOperationLength
+> = LengthedBinaryNot<PadStart<`${N}`, Length, "0">>;
 export type BAnd<
   A extends number,
   B extends number,
