@@ -3,6 +3,7 @@ import type { AnyArray, AnyParams } from "./array";
 
 export type Func<Params extends AnyArray, Result> = (...args: Params) => Result;
 export type AnyFunc = Func<AnyParams, any>;
+export type Terminator = Func<[], never>;
 export type TypeGuard<Union, SubSet extends Union> = (
   obj: Union
 ) => obj is SubSet;

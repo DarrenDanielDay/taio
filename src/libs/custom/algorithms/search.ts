@@ -1,7 +1,4 @@
-import { isPrimitive } from "../../../utils/validator/primitive";
 import { LinkedQueue } from "../data-structure/queue/linked-queue";
-import { LinkedStack } from "../data-structure/stack/linked-stack";
-
 interface SearchResult {
   circular: Set<unknown>;
 }
@@ -11,27 +8,41 @@ export function* dfs<T, R>(
   next: (value: T) => Iterable<T>,
   visitor: (value: T) => R
 ): Generator<R, SearchResult, boolean | undefined> {
+  interface StackFrame {
+    target: T;
+    iterator?: Iterator<T>;
+  }
   const visited = new Set<T>();
   const circular = new Set<unknown>();
-  const stack = new LinkedStack<T>();
-  stack.push(root);
-  while (!!stack.size) {
-    const current = stack.pop();
-    visited.add(current);
-    const deeper = yield visitor.call(undefined, current);
-    if (deeper === false) {
-      continue;
-    }
-    const reverseStack = new LinkedStack<T>();
-    for (const newTarget of next.call(undefined, current)) {
-      if (!visited.has(newTarget)) {
-        reverseStack.push(newTarget);
-      } else if (!isPrimitive(newTarget)) {
-        circular.add(newTarget);
+  const stack = new Array<StackFrame>();
+  stack.push({ target: root });
+  while (!!stack.length) {
+    const currentFrame = stack.at(-1)!;
+    const current = currentFrame.target;
+    const currentIterator = currentFrame.iterator;
+    if (!currentIterator) {
+      const deeper = yield visitor.call(undefined, current);
+      visited.add(current);
+      if (deeper === false) {
+        stack.pop();
+        continue;
       }
     }
-    while (!!reverseStack.size) {
-      stack.push(reverseStack.pop());
+    const iterator =
+      currentIterator ??
+      (currentFrame.iterator = next
+        .call(undefined, current)
+        [Symbol.iterator]());
+    const iteration = iterator.next();
+    if (iteration.done) {
+      stack.pop();
+    } else {
+      const nextTarget = iteration.value;
+      if (!visited.has(nextTarget)) {
+        stack.push({ target: nextTarget });
+      } else {
+        circular.add(nextTarget);
+      }
     }
   }
   return {
@@ -58,7 +69,7 @@ export function* bfs<T, R>(
     for (const newTarget of next.call(undefined, current)) {
       if (!visited.has(newTarget)) {
         queue.enqueue(newTarget);
-      } else if (!isPrimitive(newTarget)) {
+      } else {
         circular.add(newTarget);
       }
     }

@@ -3,7 +3,7 @@ import { isUnionThat } from "./array";
 import type { Assertion, Validator } from "./common";
 import { isObjectLike } from "./object";
 import { isNull, isNullish, isUndefined } from "./primitive";
-
+export const noCheck = <T extends unknown>(_: T): _ is never => true;
 export const optional = <T extends unknown>(
   validator: Validator<T>
 ): Validator<T | undefined> => isUnionThat(validator, isUndefined);

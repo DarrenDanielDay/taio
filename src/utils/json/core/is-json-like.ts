@@ -75,7 +75,7 @@ export const isJSONLike = (value: unknown): boolean => {
       return false;
     }
   }
-  return current.value.circular.size === 0;
+  return [...current.value.circular].every((obj) => isPrimitive(obj));
 };
 
 const hasPrototype = (

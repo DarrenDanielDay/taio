@@ -1,4 +1,5 @@
-import type { InstanceSource } from "../../types/concepts";
+import type { AnyParams } from "../../types/array";
+import type { ConstructorOf, InstanceSource } from "../../types/concepts";
 import type { EmptyObject } from "../../types/object";
 import type { Validator } from "./common";
 import { isNull } from "./primitive";
@@ -26,3 +27,8 @@ export const isInstanceOf =
   (value): value is T =>
     // @ts-expect-error Symbol.hasInstance is not considered by TypeScript
     value instanceof constructor;
+
+export const hasPrototypeConstructor =
+  <T extends object>(constructor: ConstructorOf<T, AnyParams>): Validator<T> =>
+  (value): value is T =>
+    Object.getPrototypeOf(value)?.constructor === constructor;
