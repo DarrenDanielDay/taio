@@ -1,5 +1,6 @@
 import type { AnyArray, ArrayItem, EmptyTuple } from "./array";
 import type { LiteralToPrimitive, PrimitiveTypes } from "./common";
+import type { AnyFunc } from "./concepts";
 import type { TemplateAllowedTypes } from "./string";
 // To ensure it's always empty, we should use type alias rather than interface.
 // Interface can be merged by other declaration while type alias cannot.
@@ -21,7 +22,7 @@ export type DeepMutable<T> = T extends PrimitiveTypes
   ? DeepMutable<ArrayItem<T>>[]
   : { -readonly [K in keyof T]: DeepMutable<T[K]> };
 
-export type DeepPartial<T> = T extends AnyArray | PrimitiveTypes
+export type DeepPartial<T> = T extends AnyArray | AnyFunc | PrimitiveTypes
   ? T
   : { [K in keyof T]?: DeepPartial<T[K]> };
 export type AccessPaths<T> = T extends object

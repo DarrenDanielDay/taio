@@ -1,12 +1,14 @@
+import type { Func, Mapper } from "../../../types/concepts";
 import { LinkedQueue } from "../data-structure/queue/linked-queue";
 interface SearchResult {
   circular: Set<unknown>;
 }
 
+type IterateNext<T> = Func<[value: T], Iterable<T>>;
 export function* dfs<T, R>(
   root: T,
-  next: (value: T) => Iterable<T>,
-  visitor: (value: T) => R
+  next: IterateNext<T>,
+  visitor: Mapper<T, R>
 ): Generator<R, SearchResult, boolean | undefined> {
   interface StackFrame {
     target: T;
@@ -52,8 +54,8 @@ export function* dfs<T, R>(
 
 export function* bfs<T, R>(
   root: T,
-  next: (value: T) => Iterable<T>,
-  visitor: (value: T) => R
+  next: IterateNext<T>,
+  visitor: Mapper<T, R>
 ): Generator<R, SearchResult, boolean | undefined> {
   const visited = new Set<T>();
   const queue = new LinkedQueue<T>();

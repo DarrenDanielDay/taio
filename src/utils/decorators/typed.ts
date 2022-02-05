@@ -1,5 +1,5 @@
 import { identity } from "../../libs/custom/functions/identity";
-import type { AnyMethod, Method, MethodKeys } from "../../types/concepts";
+import type { AnyMethod, Func, Method, MethodKeys } from "../../types/concepts";
 import type { IndexKey } from "../../types/converts";
 import type { AnyPrototype } from "../../types/object";
 // @ts-expect-error Contravariance
@@ -34,5 +34,5 @@ export const property: <This, Key extends keyof This>(
 
 // @ts-expect-error Contravariance
 export const cls: <Class extends AnyPrototype>(
-  decorator: (cls: Class) => Class | void
+  decorator: Func<[cls: Class], Class | void>
 ) => ClassDecorator = identity;

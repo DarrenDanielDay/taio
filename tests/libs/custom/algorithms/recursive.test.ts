@@ -1,31 +1,55 @@
-import { recursive } from "../../../../src/libs/custom/algorithms/recursive";
+/* eslint-disable @typescript-eslint/unbound-method */
+import {
+  CacheMap,
+  recursive,
+  RecursiveCaller,
+  RecursiveGenerator,
+} from "../../../../src/libs/custom/algorithms/recursive";
+import { TypedObject } from "../../../../src/libs/typescript/object";
+import type { Mapper } from "../../../../src/types/concepts";
 
-describe("recursive", () => {
-  it("should be recursive logic", () => {
-    const fibo = recursive<number, number>(
-      (call) =>
-        function* (n) {
-          if (n === 0 || n === 1) {
-            return 1;
-          }
-          const fn2 = yield call(n - 2);
-          const fn1 = yield call(n - 1);
-          return fn2 + fn1;
-        }
-    );
-    expect(fibo(0)).toBe(1);
-    expect(fibo(1)).toBe(1);
-    expect(fibo(2)).toBe(2);
-    expect(fibo(3)).toBe(3);
-    expect(fibo(4)).toBe(5);
-    expect(fibo(5)).toBe(8);
-    expect(fibo(6)).toBe(13);
-    expect(fibo(7)).toBe(21);
-    expect(fibo(8)).toBe(34);
-  });
+describe("recursive factory", () => {
+  const fiboFactory = (
+    call: RecursiveCaller<number>
+  ): ((n: number) => RecursiveGenerator<number, number>) =>
+    function* (n) {
+      if (n === 0 || n === 1) {
+        return 1;
+      }
+      const fn2 = yield call(n - 2);
+      const fn1 = yield call(n - 1);
+      return fn2 + fn1;
+    };
+  type FiboTestCase = [number, number];
+
+  const basicFiboCases: FiboTestCase[] = [
+    [0, 1],
+    [1, 1],
+    [2, 2],
+    [3, 3],
+    [4, 5],
+    [5, 8],
+    [6, 13],
+    [7, 21],
+    [8, 34],
+    [9, 55],
+  ];
+  const greateCases: FiboTestCase[] = [
+    [30, 1346269],
+    [50, 20365011074],
+  ];
+  const testFiboLogic = (
+    fiboFn: Mapper<number, number>,
+    cases: FiboTestCase[]
+  ) => {
+    for (const fiboCase of cases) {
+      const [n, fiboN] = fiboCase;
+      expect(fiboFn(n)).toBe<number>(fiboN);
+    }
+  };
   const sumNFactory = (
-    call: (param: number) => number
-  ): ((n: number) => Generator<number, number, number>) =>
+    call: RecursiveCaller<number>
+  ): ((n: number) => RecursiveGenerator<number, number>) =>
     function* (n) {
       if (n === 1) {
         return 1;
@@ -36,6 +60,11 @@ describe("recursive", () => {
     const gaussSum = (input * (input + 1)) / 2;
     expect(sumFn(input)).toBe(gaussSum);
   };
+  it("should be recursive logic", () => {
+    const fibo = recursive<number, number>(fiboFactory);
+    testFiboLogic(fibo, basicFiboCases);
+  });
+
   it("should not stack overflow without limit", () => {
     const testN = 2000;
     const sumN = recursive<number, number>(sumNFactory);
@@ -43,13 +72,18 @@ describe("recursive", () => {
   });
   it("should throw stack overflow with limit", () => {
     const testN = 2000;
-    const sumNGreaterThanMax = recursive<number, number>(
-      sumNFactory,
-      testN - 1
-    );
-    const sumNExactMax = recursive(sumNFactory, testN);
-    const sumNLessThanMax = recursive(sumNFactory, testN + 1);
-    const noRecursive = recursive(sumNFactory, 1);
+    const sumNGreaterThanMax = recursive<number, number>(sumNFactory, {
+      maxStack: testN - 1,
+    });
+    const sumNExactMax = recursive(sumNFactory, {
+      maxStack: testN,
+    });
+    const sumNLessThanMax = recursive(sumNFactory, {
+      maxStack: testN + 1,
+    });
+    const noRecursive = recursive(sumNFactory, {
+      maxStack: 1,
+    });
     expect(() => {
       testSumLogic(sumNLessThanMax, testN);
     }).not.toThrow();
@@ -66,5 +100,112 @@ describe("recursive", () => {
     expect(() => {
       testSumLogic(noRecursive, 2);
     }).toThrow(stackOverflow);
+  });
+  it("should throw with unchecked frame", () => {
+    const fn = recursive<number, number>(
+      () =>
+        function* (n) {
+          if (n !== 0) {
+            yield {
+              payload: 0,
+            };
+          }
+          return 0;
+        }
+    );
+    expect(() => {
+      fn(1);
+    }).toThrow(/unknown/i);
+  });
+  it("should throw with invalid operation on call/yield context", () => {
+    const muteCtx = recursive<number, number>(
+      (call) =>
+        function* (n) {
+          const ctx = call(n - 1);
+          Object.assign(ctx, { payload: n + 1 });
+          return n;
+        }
+    );
+    expect(() => {
+      muteCtx(0);
+    }).toThrow();
+  });
+  it("should use Map to cache", () => {
+    const fibo = recursive(fiboFactory, {
+      memo: {
+        cacheParam: true,
+      },
+    });
+    testFiboLogic(fibo, [[4, 5]]);
+    testFiboLogic(fibo, greateCases);
+  }, 100);
+  it("should use custom map to cache", (done) => {
+    const underlayingCache = new Map<number, number>();
+    const exclude = ["constructor", "size"] as const;
+    const methodKeys = TypedObject.keys(
+      TypedObject.getOwnPropertyDescriptors(Map.prototype)
+    ).filter((k): k is Exclude<typeof k, typeof exclude[number]> => {
+      const key: string = k;
+      const keys: readonly string[] = exclude;
+      return !keys.includes(key);
+    });
+    // @ts-expect-error Object.fromentries needs to be better typed
+    const cache: CacheMap<number, number> = TypedObject.fromEntries(
+      methodKeys.map(
+        (key) =>
+          // @ts-expect-error Union distribution
+          [key, jest.fn(underlayingCache[key].bind(underlayingCache))] as const
+      )
+    );
+    const factory = jest.fn(() => cache);
+    const fibo = recursive(fiboFactory, {
+      memo: {
+        cacheParam: true,
+        cacheFactory: factory,
+      },
+    });
+    expect(factory).toBeCalledTimes(1);
+    testFiboLogic(fibo, basicFiboCases);
+    testFiboLogic(fibo, greateCases);
+    testFiboLogic(fibo, greateCases);
+    testFiboLogic(fibo, basicFiboCases);
+    expect(factory).toBeCalledTimes(1);
+    const { set } = cache;
+    expect(set).toBeCalledTimes(51);
+    done();
+  }, 100);
+  it("should not infinite loop with tricky cache", () => {
+    let ctx: ReturnType<RecursiveCaller<number>> | null = null;
+    const fn = recursive<number, number>(
+      (call) =>
+        function* (n) {
+          if (!ctx) {
+            ctx = call(n - 1);
+          }
+          yield ctx;
+          return n;
+        }
+    );
+    expect(() => {
+      fn(1);
+    }).toThrow(/infinite loop/i);
+  });
+  it("should not throw when yield context that are done", () => {
+    const fn = recursive<number, number>(
+      (call) =>
+        function* (n) {
+          if (n === 0) {
+            return 1;
+          }
+          const ctx = call(n - 1);
+          const n1 = yield ctx;
+          const n2 = yield ctx;
+          return n1 + n2;
+        }
+    );
+    expect(() => {
+      fn(1);
+    }).not.toThrow();
+    expect(fn(1)).toBe(2);
   });
 });

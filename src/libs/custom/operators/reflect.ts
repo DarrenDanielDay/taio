@@ -2,7 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createProxyHost } from "../../../utils/typed-function";
 import type { AnyParams } from "../../../types/array";
-import type { AnyFunc, Func, Method } from "../../../types/concepts";
+import type {
+  AnyFunc,
+  ConstructorOf,
+  Func,
+  Mapper,
+  Method,
+} from "../../../types/concepts";
 
 export type Operation =
   | ApplyOperation<any, any, any, any>
@@ -37,7 +43,7 @@ export interface ApplyOperation<
 }
 
 export interface ConstructOperation<
-  T extends new (...args: AnyParams) => R,
+  T extends ConstructorOf<R, AnyParams>,
   Args extends AnyParams,
   R
 > extends BaseOperation<T> {
@@ -263,7 +269,7 @@ export const createExpressionAnalyser = (
   return proxyHandler;
 };
 
-export const trackExpression = <T, R>(expression: (input: T) => R) => {
+export const trackExpression = <T, R>(expression: Mapper<T, R>) => {
   const track: Operation[] = [];
   const handler = createExpressionAnalyser(track);
   Reflect.apply(expression, undefined, [new Proxy(createProxyHost(), handler)]);

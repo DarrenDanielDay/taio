@@ -2,6 +2,7 @@
 import type { AnyArray, AnyParams } from "./array";
 
 export type Func<Params extends AnyArray, Result> = (...args: Params) => Result;
+export type Creater<T> = Func<[], T>;
 export type AnyFunc = Func<AnyParams, any>;
 export type Terminator = Func<[], never>;
 export type TypeGuard<Union, SubSet extends Union> = (
@@ -10,7 +11,7 @@ export type TypeGuard<Union, SubSet extends Union> = (
 export type TypeAssertionFunc<Union, Subset extends Union> = (
   obj: Union
 ) => asserts obj is Subset;
-export type Mapper<In, Out> = Func<[In], Out>;
+export type Mapper<In, Out> = Func<[source: In], Out>;
 export type Predicate<T> = Mapper<T, boolean>;
 export type Method<This, Params extends AnyArray, Result> = (
   this: This,
@@ -18,7 +19,7 @@ export type Method<This, Params extends AnyArray, Result> = (
 ) => Result;
 export type AnyMethod = Method<any, AnyParams, any>;
 export type Getter<This, T> = Method<This, [], T>;
-export type Setter<This, T> = Method<This, [T], void>;
+export type Setter<This, T> = Method<This, [value: T], void>;
 export type MethodKeys<This> = {
   [K in keyof This]: This[K] extends AnyFunc ? K : never;
 }[keyof This];
