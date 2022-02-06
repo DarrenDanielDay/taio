@@ -194,6 +194,7 @@ describe("recursive factory", () => {
     expect(() => {
       fn(1);
     }).not.toThrow();
-    expect(fn(1)).toBe(2);
+    const result = fn(1);
+    expect(result).toBe(2);
   });
 });

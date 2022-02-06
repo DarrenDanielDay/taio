@@ -2,6 +2,7 @@ import type { AnyParams } from "../../../types/array";
 import type { Creater, Func, Method } from "../../../types/concepts";
 import type { DeepPartial } from "../../../types/object";
 import { die } from "../../../utils/internal/exceptions";
+import { noop } from "../../../utils/typed-function";
 import { argument } from "../functions/argument";
 
 type ProtectedRecursiveParam<T> = [param: T];
@@ -9,9 +10,16 @@ type ProtectedRecursiveCaller<T> = Func<
   ProtectedRecursiveParam<T>,
   ProtectedRecursiveRequest<T>
 >;
-export type ProtectedRecursiveGenerator<T, R> = Generator<
+
+export type RecursiveGenerator<T, R> = Generator<T, R, R>;
+
+export type ProtectedRecursiveGenerator<T, R> = RecursiveGenerator<
   ProtectedRecursiveRequest<T>,
-  R,
+  R
+>;
+
+export type RawRecursiveGenerator<P extends AnyParams, R> = RecursiveGenerator<
+  P,
   R
 >;
 
@@ -31,8 +39,9 @@ interface ProtectedRecursiveRequest<T> {
   readonly payload: T;
 }
 
-interface RawRecursiveThisContext<P extends AnyParams> {
+interface RawRecursiveThisContext<P extends AnyParams, R> {
   call: Func<P, P>;
+  stack: RawRecursiveGenerator<P, R>[];
 }
 interface ProtectedRecursiveThisContext<T> {
   call: ProtectedRecursiveCaller<T>;
@@ -45,9 +54,9 @@ interface GeneralRecursiveThisContext<P extends AnyParams> {
 }
 
 export type RawRecursiveFactory<P extends AnyParams, R> = Method<
-  RawRecursiveThisContext<P>,
+  RawRecursiveThisContext<P, R>,
   P,
-  Generator<P, R, R>
+  RawRecursiveGenerator<P, R>
 >;
 
 export type ProtectedRecursiveFactory<T, R> = Method<
@@ -71,11 +80,12 @@ export type GeneralRecursiveFactory<T, R> = Method<
 export const rawRecursive = <P extends AnyParams, R>(
   factory: RawRecursiveFactory<P, R>
 ): Func<P, R> => {
-  const ctx: RawRecursiveThisContext<P> = {
-    call: argument,
-  };
   return (...args) => {
-    const stack = new Array<Generator<P, R, R>>();
+    const stack: RawRecursiveGenerator<P, R>[] = [];
+    const ctx: RawRecursiveThisContext<P, R> = {
+      call: argument,
+      stack,
+    };
     const invoke = (args: P) => {
       const iterator = factory.apply(ctx, args);
       const initIteration = iterator.next();
@@ -100,128 +110,90 @@ export const rawRecursive = <P extends AnyParams, R>(
     return iteration.value;
   };
 };
+const stackOverflow = () => die("Stack overflow.");
+const circlularFrame = () =>
+  die(
+    "Cannot yield `call` result more than once when the last `yield` is not done, which may lead to infinite loop."
+  );
+
+const uncheckedCall = () =>
+  die(
+    "Unknown stack frame. Invoke the passed `call` function to create stack frame."
+  );
 
 export const protectedRecursive = <T, R>(
   factory: ProtectedRecursiveFactory<T, R>,
   config?: DeepPartial<RecursiveConfig<T, R>>
 ) => {
-  type StackState = "done" | "init" | "pending" | "started";
-
-  interface PreparedStackFrame {
-    iterator?: ProtectedRecursiveGenerator<T, R>;
-    request: ProtectedRecursiveRequest<T>;
-    state: StackState;
-    result?: R;
-  }
-  interface ActiveStackFrame extends PreparedStackFrame {
-    iterator: ProtectedRecursiveGenerator<T, R>;
-    state: Exclude<StackState, "init">;
-  }
+  type StackState = "init" | "started";
   const maxStack = config?.maxStack ?? Infinity;
   const cacheParam = config?.memo?.cacheParam ?? false;
   const cache = cacheParam
     ? (config?.memo?.cacheFactory ?? (() => new Map<T, R>()))()
     : (null as never);
-
-  return (init: T) => {
-    const mapRequestToFrame = new Map<
-      ProtectedRecursiveRequest<T>,
-      PreparedStackFrame
-    >();
-    const call = (param: T): ProtectedRecursiveRequest<T> => {
-      if (stack.length >= maxStack) {
-        return die("Stack overflow.");
-      }
-      const request: ProtectedRecursiveRequest<T> = Object.freeze({
-        payload: param,
-      });
-      const newStackFrame: PreparedStackFrame = {
-        request,
-        state: "init",
-      };
-      if (cacheParam) {
-        if (cache.has(param)) {
-          const cached = cache.get(param)!;
-          newStackFrame.iterator = (function* () {
-            return cached;
-          })();
+  const memorizeIfNeedCache = cacheParam
+    ? (param: T, result: R) => {
+        if (!cache.has(param)) {
+          cache.set(param, result);
         }
       }
-      mapRequestToFrame.set(request, newStackFrame);
-      return request;
-    };
-    const ctx: ProtectedRecursiveThisContext<T> = {
-      call,
-    };
-    const stack = new Array<ActiveStackFrame>();
-    const activateFrame: (
-      frame: PreparedStackFrame,
-      input: T
-    ) => asserts frame is ActiveStackFrame = (frame, input) => {
-      frame.iterator = frame.iterator ?? factory.call(ctx, input);
-      if (frame.state === "init") {
-        frame.state = "pending";
-      }
-    };
-    const invokeFrameWithRequest = (
-      request: ProtectedRecursiveRequest<T>
-    ): void => {
-      const frame = mapRequestToFrame.get(request);
-      if (!frame) {
-        return die(
-          "Unknown stack frame. Invoke the passed `call` function to create stack frame."
-        );
-      }
-      if (frame.state !== "init" && frame.state !== "done") {
-        return die(
-          "Cannot yield `call` result more than once when the last `yield` is not done, which may lead to infinite loop."
-        );
-      }
-      activateFrame(frame, request.payload);
-      stack.push(frame);
-    };
-    invokeFrameWithRequest(call(init));
-    // @ts-expect-error Unknown initial value.
-    let returnValue: R = undefined;
-    while (!!stack.length) {
-      const currentFrame = stack.at(-1)!;
-      const { iterator, state } = currentFrame;
-      const iteration = ((): IteratorResult<
-        ProtectedRecursiveRequest<T>,
-        R
-      > => {
-        switch (state) {
-          case "pending":
-            const iteration = iterator.next();
-            currentFrame.state = "started";
-            return iteration;
-          case "started":
-            return iterator.next(returnValue);
-          case "done":
-            return {
-              done: true,
-              value: currentFrame.result!,
-            };
-        }
-      })();
-      if (iteration.done) {
-        stack.pop();
-        currentFrame.state = "done";
-        const userResult = iteration.value;
-        currentFrame.result = userResult;
-        returnValue = userResult;
-        if (cacheParam) {
-          const param = currentFrame.request.payload;
-          if (!cache.has(param)) {
-            cache.set(param, userResult);
-          }
-        }
-      } else {
-        invokeFrameWithRequest(iteration.value);
-      }
+    : noop;
+  type P = ProtectedRecursiveParam<T>;
+  const createResult = (value: R) =>
+    (function* () {
+      return value;
+    })();
+  const requestState = new WeakMap<
+    ProtectedRecursiveRequest<T>,
+    StackState | { result: R }
+  >();
+  return rawRecursive<P, R>(function (value) {
+    if (cacheParam && cache.has(value)) {
+      return createResult(cache.get(value)!);
     }
-    return returnValue;
-  };
+    const ctx: ProtectedRecursiveThisContext<T> = {
+      call: (payload) => {
+        const request: ProtectedRecursiveRequest<T> = Object.freeze({
+          payload,
+        });
+        requestState.set(request, "init");
+        return request;
+      },
+    };
+    return function* (
+      this: RawRecursiveThisContext<P, R>,
+      passedValue: T
+    ): RawRecursiveGenerator<P, R> {
+      if (this.stack.length >= maxStack) {
+        return stackOverflow();
+      }
+      const generator = factory.call(ctx, passedValue);
+      let iteration = generator.next();
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      while (true) {
+        if (!iteration.done) {
+          const request = iteration.value;
+          const state = requestState.get(request);
+          if (state === undefined) {
+            return uncheckedCall();
+          } else if (state === "init") {
+            requestState.set(request, "started");
+            const param = request.payload;
+            const result = yield this.call(param);
+            requestState.set(request, { result });
+            iteration = generator.next(result);
+          } else if (state === "started") {
+            return circlularFrame();
+          } else {
+            iteration = generator.next(state.result);
+          }
+        } else {
+          const result = iteration.value;
+          memorizeIfNeedCache(passedValue, result);
+          return result;
+        }
+      }
+    }.call(this, value);
+  });
 };
-
 export const recursive = protectedRecursive;
