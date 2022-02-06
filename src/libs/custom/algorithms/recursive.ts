@@ -31,8 +31,17 @@ interface ProtectedRecursiveRequest<T> {
   readonly payload: T;
 }
 
-export interface RawRecursiveThisContext<P extends AnyParams> {
+interface RawRecursiveThisContext<P extends AnyParams> {
   call: Func<P, P>;
+}
+interface ProtectedRecursiveThisContext<T> {
+  call: ProtectedRecursiveCaller<T>;
+}
+
+interface GeneralRecursiveThisContext<P extends AnyParams> {
+  // Not type safe.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  call: Func<P, any>;
 }
 
 export type RawRecursiveFactory<P extends AnyParams, R> = Method<
@@ -41,38 +50,56 @@ export type RawRecursiveFactory<P extends AnyParams, R> = Method<
   Generator<P, R, R>
 >;
 
+export type ProtectedRecursiveFactory<T, R> = Method<
+  ProtectedRecursiveThisContext<T>,
+  ProtectedRecursiveParam<T>,
+  ProtectedRecursiveGenerator<T, R>
+>;
+
+/**
+ * To make factory functions with only one parameter to work with both {@link protectedRecursive} and {@link rawRecursive}, use this type for annotation.
+ * It's not completely type safe, so make sure to use `yield this.call(param)` to perform a recursive call.
+ */
+export type GeneralRecursiveFactory<T, R> = Method<
+  GeneralRecursiveThisContext<ProtectedRecursiveParam<T>>,
+  ProtectedRecursiveParam<T>,
+  // Not type safe.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Generator<any, R, R>
+>;
+
 export const rawRecursive = <P extends AnyParams, R>(
   factory: RawRecursiveFactory<P, R>
 ): Func<P, R> => {
   const ctx: RawRecursiveThisContext<P> = {
     call: argument,
   };
-  const invoke = (args: P) => factory.apply(ctx, args);
   return (...args) => {
-    // @ts-expect-error Unknown return value
-    let returnValue: R = undefined;
-    const stack = new Array<Generator<P, R, R>>(invoke(args));
-    for (let iterator = stack.at(-1); iterator; iterator = stack.at(-1)) {
-      const iteration = iterator.next(returnValue);
+    const stack = new Array<Generator<P, R, R>>();
+    const invoke = (args: P) => {
+      const iterator = factory.apply(ctx, args);
+      const initIteration = iterator.next();
+      stack.push(iterator);
+      return [iterator, initIteration] as const;
+    };
+    let [iterator, iteration] = invoke(args);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
       if (iteration.done) {
         stack.pop();
-        returnValue = iteration.value;
+        const nextTterator = stack.at(-1);
+        if (!nextTterator) {
+          break;
+        }
+        iterator = nextTterator;
+        iteration = iterator.next(iteration.value);
       } else {
-        stack.push(invoke(iteration.value));
+        [iterator, iteration] = invoke(iteration.value);
       }
     }
-    return returnValue;
+    return iteration.value;
   };
 };
-
-export interface ProtectedRecursiveThisContext<T> {
-  call: ProtectedRecursiveCaller<T>;
-}
-export type ProtectedRecursiveFactory<T, R> = Method<
-  ProtectedRecursiveThisContext<T>,
-  ProtectedRecursiveParam<T>,
-  ProtectedRecursiveGenerator<T, R>
->;
 
 export const protectedRecursive = <T, R>(
   factory: ProtectedRecursiveFactory<T, R>,

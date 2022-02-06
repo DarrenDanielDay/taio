@@ -3,16 +3,15 @@ import {
   CacheMap,
   recursive,
   rawRecursive,
+  GeneralRecursiveFactory,
   ProtectedRecursiveFactory,
-  ProtectedRecursiveThisContext,
 } from "../../../../src/libs/custom/algorithms/recursive";
 import { TypedObject } from "../../../../src/libs/typescript/object";
 import type { Mapper } from "../../../../src/types/concepts";
 
 describe("recursive factory", () => {
-  type NumRecursiveMappingFactory = ProtectedRecursiveFactory<number, number>;
-
-  const protectedFiboFactory: NumRecursiveMappingFactory = function* (n) {
+  type NumRecursiveMappingFactory = GeneralRecursiveFactory<number, number>;
+  const fiboFactory: NumRecursiveMappingFactory = function* (n) {
     if (n === 0 || n === 1) {
       return 1;
     }
@@ -47,7 +46,7 @@ describe("recursive factory", () => {
       expect(fiboFn(n)).toBe<number>(fiboN);
     }
   };
-  const protectedSumNFactory: NumRecursiveMappingFactory = function* (n) {
+  const sumNFactory: NumRecursiveMappingFactory = function* (n) {
     if (n === 1) {
       return 1;
     }
@@ -58,34 +57,29 @@ describe("recursive factory", () => {
     expect(sumFn(input)).toBe(gaussSum);
   };
   it("should be recursive logic", () => {
-    const fibo = recursive<number, number>(protectedFiboFactory);
-    const rawFibo = rawRecursive<[n: number], number>(function* (n) {
-      if (n === 0 || n === 1) {
-        return 1;
-      }
-      return (yield this.call(n - 2)) + (yield this.call(n - 1));
-    });
+    const fibo = recursive(fiboFactory);
+    const rawFibo = rawRecursive(fiboFactory);
     testFiboLogic(fibo, basicFiboCases);
     testFiboLogic(rawFibo, basicFiboCases);
   });
 
   it("should not stack overflow without limit", () => {
     const testN = 2000;
-    const sumN = recursive<number, number>(protectedSumNFactory);
+    const sumN = recursive(sumNFactory);
     testSumLogic(sumN, testN);
   });
   it("should throw stack overflow with limit", () => {
     const testN = 2000;
-    const sumNGreaterThanMax = recursive<number, number>(protectedSumNFactory, {
+    const sumNGreaterThanMax = recursive(sumNFactory, {
       maxStack: testN - 1,
     });
-    const sumNExactMax = recursive(protectedSumNFactory, {
+    const sumNExactMax = recursive(sumNFactory, {
       maxStack: testN,
     });
-    const sumNLessThanMax = recursive(protectedSumNFactory, {
+    const sumNLessThanMax = recursive(sumNFactory, {
       maxStack: testN + 1,
     });
-    const noRecursive = recursive(protectedSumNFactory, {
+    const noRecursive = recursive(sumNFactory, {
       maxStack: 1,
     });
     expect(() => {
@@ -129,7 +123,7 @@ describe("recursive factory", () => {
     }).toThrow();
   });
   it("should use Map to cache", () => {
-    const fibo = recursive(protectedFiboFactory, {
+    const fibo = recursive(fiboFactory, {
       memo: {
         cacheParam: true,
       },
@@ -156,7 +150,7 @@ describe("recursive factory", () => {
       )
     );
     const factory = jest.fn(() => cache);
-    const fibo = recursive(protectedFiboFactory, {
+    const fibo = recursive(fiboFactory, {
       memo: {
         cacheParam: true,
         cacheFactory: factory,
@@ -173,8 +167,9 @@ describe("recursive factory", () => {
     done();
   }, 100);
   it("should not infinite loop with tricky cache", () => {
-    let ctx: ReturnType<ProtectedRecursiveThisContext<number>["call"]> | null =
-      null;
+    let ctx: ReturnType<
+      ThisParameterType<ProtectedRecursiveFactory<number, number>>["call"]
+    > | null = null;
     const fn = recursive<number, number>(function* (n) {
       if (!ctx) {
         ctx = this.call(n - 1);
