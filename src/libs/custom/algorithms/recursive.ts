@@ -26,11 +26,22 @@ export type RawRecursiveGenerator<P extends AnyParams, R> = RecursiveGenerator<
 export interface CacheMap<K, V> extends Map<K, V> {}
 
 interface ProtectedRecursiveMemoConfig<T, R> {
+  /**
+   * Whether to use cache by parameter.
+   * default `false`
+   */
   cacheParam: boolean;
+  /**
+   * The cache factory function.
+   * default `() => new Map<T, R>()`
+   */
   cacheFactory: Creater<CacheMap<T, R>>;
 }
 
 export interface RecursiveConfig<T, R> {
+  /**
+   * Max recursive stack size. `Infinity` by default.
+   */
   maxStack: number;
   memo: ProtectedRecursiveMemoConfig<T, R>;
 }
@@ -41,6 +52,10 @@ interface ProtectedRecursiveRequest<T> {
 
 interface RawRecursiveThisContext<P extends AnyParams, R> {
   call: Func<P, P>;
+  /**
+   * The internal iterator stack.
+   * Don't try to invoke `generator.next()` or modify it, or the stack might be corrupted.
+   */
   stack: RawRecursiveGenerator<P, R>[];
 }
 interface ProtectedRecursiveThisContext<T> {
@@ -77,6 +92,30 @@ export type GeneralRecursiveFactory<T, R> = Method<
   Generator<any, R, R>
 >;
 
+/**
+ * Perform a recursive computation without increasing call stack frames as the recursion grow.
+ * A Fibonacci sequence example with this API:
+ * ```ts
+ * // 1. Define a recursive function by call this API like this:
+ * const fibo = rawRecursive<[n: number], number>(
+ * // 2. Pass a generator function as the parameter
+ * function* (n) {
+ *   if (n === 0 || n === 1) {
+ *     return 1;
+ *   }
+ *   // 3. Use `yield this.call(...params)` to perform a recursive call
+ *   const fn2 = yield this.call(n - 2);
+ *   const fn1 = yield this.call(n - 1);
+ *   return fn2 + fn1;
+ * });
+ * // 4. Use the defined recursive function to compute:
+ * console.log(fibo(1)) // 1
+ * console.log(fibo(2)) // 2
+ * console.log(fibo(8)) // 34
+ * ```
+ * @param factory the factory function which returns a generator
+ * @returns sync recursive result
+ */
 export const rawRecursive = <P extends AnyParams, R>(
   factory: RawRecursiveFactory<P, R>
 ): Func<P, R> => {
@@ -121,6 +160,33 @@ const uncheckedCall = () =>
     "Unknown stack frame. Invoke the passed `call` function to create stack frame."
   );
 
+/**
+ * Same core logic with {@link rawRecursive} but safer than {@link rawRecursive} with extra config.
+ * This API calls {@link rawRecursive} internally.
+ * The parameter generator function should have **exactly one parameter**.
+ * A Fibonacci sequence example with this API:
+ * ```ts
+ * // 1. Define a recursive function by call this API like this:
+ * const fibo = protectedRecursive<number, number>(
+ * // 2. Pass a generator function as the parameter.
+ * function* (n) {
+ *   if (n === 0 || n === 1) {
+ *     return 1;
+ *   }
+ *   // 3. Use `yield this.call(params)` to perform a recursive call
+ *   const fn2 = yield this.call(n - 2);
+ *   const fn1 = yield this.call(n - 1);
+ *   return fn2 + fn1;
+ * });
+ * // 4. Use the defined recursive function to compute:
+ * console.log(fibo(1)) // 1
+ * console.log(fibo(2)) // 2
+ * console.log(fibo(8)) // 34
+ * ```
+ * @param factory the factory function which returns a generator
+ * @param config the config
+ * @returns sync recursive result
+ */
 export const protectedRecursive = <T, R>(
   factory: ProtectedRecursiveFactory<T, R>,
   config?: DeepPartial<RecursiveConfig<T, R>>
