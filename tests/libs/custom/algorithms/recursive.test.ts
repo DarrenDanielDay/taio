@@ -2,26 +2,24 @@
 import {
   CacheMap,
   recursive,
-  ProtectedRecursiveCaller,
-  ProtectedRecursiveGenerator,
   rawRecursive,
-  composeProtectedFactory,
+  ProtectedRecursiveFactory,
+  ProtectedRecursiveThisContext,
 } from "../../../../src/libs/custom/algorithms/recursive";
 import { TypedObject } from "../../../../src/libs/typescript/object";
 import type { Mapper } from "../../../../src/types/concepts";
 
 describe("recursive factory", () => {
-  const protectedFiboFactory = (
-    call: ProtectedRecursiveCaller<number>
-  ): ((n: number) => ProtectedRecursiveGenerator<number, number>) =>
-    function* (n) {
-      if (n === 0 || n === 1) {
-        return 1;
-      }
-      const fn2 = yield call(n - 2);
-      const fn1 = yield call(n - 1);
-      return fn2 + fn1;
-    };
+  type NumRecursiveMappingFactory = ProtectedRecursiveFactory<number, number>;
+
+  const protectedFiboFactory: NumRecursiveMappingFactory = function* (n) {
+    if (n === 0 || n === 1) {
+      return 1;
+    }
+    const fn2 = yield this.call(n - 2);
+    const fn1 = yield this.call(n - 1);
+    return fn2 + fn1;
+  };
   type FiboTestCase = [number, number];
 
   const basicFiboCases: FiboTestCase[] = [
@@ -49,15 +47,12 @@ describe("recursive factory", () => {
       expect(fiboFn(n)).toBe<number>(fiboN);
     }
   };
-  const protectedSumNFactory = (
-    call: ProtectedRecursiveCaller<number>
-  ): ((n: number) => ProtectedRecursiveGenerator<number, number>) =>
-    function* (n) {
-      if (n === 1) {
-        return 1;
-      }
-      return n + (yield call(n - 1));
-    };
+  const protectedSumNFactory: NumRecursiveMappingFactory = function* (n) {
+    if (n === 1) {
+      return 1;
+    }
+    return n + (yield this.call(n - 1));
+  };
   const testSumLogic = (sumFn: (n: number) => number, input: number) => {
     const gaussSum = (input * (input + 1)) / 2;
     expect(sumFn(input)).toBe(gaussSum);
@@ -72,7 +67,6 @@ describe("recursive factory", () => {
     });
     testFiboLogic(fibo, basicFiboCases);
     testFiboLogic(rawFibo, basicFiboCases);
-    testFiboLogic(composeProtectedFactory(protectedFiboFactory), basicFiboCases);
   });
 
   it("should not stack overflow without limit", () => {
@@ -112,30 +106,24 @@ describe("recursive factory", () => {
     }).toThrow(stackOverflow);
   });
   it("should throw with unchecked frame", () => {
-    const fn = recursive<number, number>(
-      () =>
-        function* (n) {
-          if (n !== 0) {
-            yield {
-              payload: 0,
-            };
-          }
-          return 0;
-        }
-    );
+    const fn = recursive<number, number>(function* (n) {
+      if (n !== 0) {
+        yield {
+          payload: 0,
+        };
+      }
+      return 0;
+    });
     expect(() => {
       fn(1);
     }).toThrow(/unknown/i);
   });
   it("should throw with invalid operation on call/yield context", () => {
-    const muteCtx = recursive<number, number>(
-      (call) =>
-        function* (n) {
-          const ctx = call(n - 1);
-          Object.assign(ctx, { payload: n + 1 });
-          return n;
-        }
-    );
+    const muteCtx = recursive<number, number>(function* (n) {
+      const ctx = this.call(n - 1);
+      Object.assign(ctx, { payload: n + 1 });
+      return n;
+    });
     expect(() => {
       muteCtx(0);
     }).toThrow();
@@ -185,34 +173,29 @@ describe("recursive factory", () => {
     done();
   }, 100);
   it("should not infinite loop with tricky cache", () => {
-    let ctx: ReturnType<ProtectedRecursiveCaller<number>> | null = null;
-    const fn = recursive<number, number>(
-      (call) =>
-        function* (n) {
-          if (!ctx) {
-            ctx = call(n - 1);
-          }
-          yield ctx;
-          return n;
-        }
-    );
+    let ctx: ReturnType<ProtectedRecursiveThisContext<number>["call"]> | null =
+      null;
+    const fn = recursive<number, number>(function* (n) {
+      if (!ctx) {
+        ctx = this.call(n - 1);
+      }
+      yield ctx;
+      return n;
+    });
     expect(() => {
       fn(1);
     }).toThrow(/infinite loop/i);
   });
   it("should not throw when yield context that are done", () => {
-    const fn = recursive<number, number>(
-      (call) =>
-        function* (n) {
-          if (n === 0) {
-            return 1;
-          }
-          const ctx = call(n - 1);
-          const n1 = yield ctx;
-          const n2 = yield ctx;
-          return n1 + n2;
-        }
-    );
+    const fn = recursive<number, number>(function* (n) {
+      if (n === 0) {
+        return 1;
+      }
+      const ctx = this.call(n - 1);
+      const n1 = yield ctx;
+      const n2 = yield ctx;
+      return n1 + n2;
+    });
     expect(() => {
       fn(1);
     }).not.toThrow();

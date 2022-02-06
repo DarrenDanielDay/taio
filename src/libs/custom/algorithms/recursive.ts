@@ -1,15 +1,16 @@
 import type { AnyParams } from "../../../types/array";
-import type { Creater, Func, Mapper } from "../../../types/concepts";
+import type { Creater, Func, Method } from "../../../types/concepts";
 import type { DeepPartial } from "../../../types/object";
 import { die } from "../../../utils/internal/exceptions";
 import { argument } from "../functions/argument";
 
-export type ProtectedRecursiveCaller<T> = Func<
-  [param: T],
-  ProtectedRecursiveContext<T>
+type ProtectedRecursiveParam<T> = [param: T];
+type ProtectedRecursiveCaller<T> = Func<
+  ProtectedRecursiveParam<T>,
+  ProtectedRecursiveRequest<T>
 >;
 export type ProtectedRecursiveGenerator<T, R> = Generator<
-  ProtectedRecursiveContext<T>,
+  ProtectedRecursiveRequest<T>,
   R,
   R
 >;
@@ -26,18 +27,24 @@ export interface RecursiveConfig<T, R> {
   memo: ProtectedRecursiveMemoConfig<T, R>;
 }
 
-interface ProtectedRecursiveContext<T> {
+interface ProtectedRecursiveRequest<T> {
   readonly payload: T;
 }
 
-export interface RawRecursiveContext<P extends AnyParams> {
+export interface RawRecursiveThisContext<P extends AnyParams> {
   call: Func<P, P>;
 }
 
+export type RawRecursiveFactory<P extends AnyParams, R> = Method<
+  RawRecursiveThisContext<P>,
+  P,
+  Generator<P, R, R>
+>;
+
 export const rawRecursive = <P extends AnyParams, R>(
-  factory: (this: RawRecursiveContext<P>, ...args: P) => Generator<P, R, R>
+  factory: RawRecursiveFactory<P, R>
 ): Func<P, R> => {
-  const ctx: RawRecursiveContext<P> = {
+  const ctx: RawRecursiveThisContext<P> = {
     call: argument,
   };
   const invoke = (args: P) => factory.apply(ctx, args);
@@ -58,9 +65,13 @@ export const rawRecursive = <P extends AnyParams, R>(
   };
 };
 
-export type ProtectedRecursiveFactory<T, R> = Func<
-  [call: ProtectedRecursiveCaller<T>],
-  Func<[args: T], ProtectedRecursiveGenerator<T, R>>
+export interface ProtectedRecursiveThisContext<T> {
+  call: ProtectedRecursiveCaller<T>;
+}
+export type ProtectedRecursiveFactory<T, R> = Method<
+  ProtectedRecursiveThisContext<T>,
+  ProtectedRecursiveParam<T>,
+  ProtectedRecursiveGenerator<T, R>
 >;
 
 export const protectedRecursive = <T, R>(
@@ -71,7 +82,7 @@ export const protectedRecursive = <T, R>(
 
   interface PreparedStackFrame {
     iterator?: ProtectedRecursiveGenerator<T, R>;
-    context: ProtectedRecursiveContext<T>;
+    request: ProtectedRecursiveRequest<T>;
     state: StackState;
     result?: R;
   }
@@ -86,19 +97,19 @@ export const protectedRecursive = <T, R>(
     : (null as never);
 
   return (init: T) => {
-    const mapContextToFrame = new Map<
-      ProtectedRecursiveContext<T>,
+    const mapRequestToFrame = new Map<
+      ProtectedRecursiveRequest<T>,
       PreparedStackFrame
     >();
-    const call = (param: T): ProtectedRecursiveContext<T> => {
+    const call = (param: T): ProtectedRecursiveRequest<T> => {
       if (stack.length >= maxStack) {
         return die("Stack overflow.");
       }
-      const context: ProtectedRecursiveContext<T> = Object.freeze({
+      const request: ProtectedRecursiveRequest<T> = Object.freeze({
         payload: param,
       });
       const newStackFrame: PreparedStackFrame = {
-        context,
+        request,
         state: "init",
       };
       if (cacheParam) {
@@ -109,24 +120,26 @@ export const protectedRecursive = <T, R>(
           })();
         }
       }
-      mapContextToFrame.set(context, newStackFrame);
-      return context;
+      mapRequestToFrame.set(request, newStackFrame);
+      return request;
     };
-
+    const ctx: ProtectedRecursiveThisContext<T> = {
+      call,
+    };
     const stack = new Array<ActiveStackFrame>();
     const activateFrame: (
       frame: PreparedStackFrame,
       input: T
     ) => asserts frame is ActiveStackFrame = (frame, input) => {
-      frame.iterator = frame.iterator ?? factory(call)(input);
+      frame.iterator = frame.iterator ?? factory.call(ctx, input);
       if (frame.state === "init") {
         frame.state = "pending";
       }
     };
-    const invokeFrameWithContext = (
-      context: ProtectedRecursiveContext<T>
+    const invokeFrameWithRequest = (
+      request: ProtectedRecursiveRequest<T>
     ): void => {
-      const frame = mapContextToFrame.get(context);
+      const frame = mapRequestToFrame.get(request);
       if (!frame) {
         return die(
           "Unknown stack frame. Invoke the passed `call` function to create stack frame."
@@ -137,18 +150,17 @@ export const protectedRecursive = <T, R>(
           "Cannot yield `call` result more than once when the last `yield` is not done, which may lead to infinite loop."
         );
       }
-      activateFrame(frame, context.payload);
-
+      activateFrame(frame, request.payload);
       stack.push(frame);
     };
-    invokeFrameWithContext(call(init));
+    invokeFrameWithRequest(call(init));
     // @ts-expect-error Unknown initial value.
     let returnValue: R = undefined;
     while (!!stack.length) {
       const currentFrame = stack.at(-1)!;
       const { iterator, state } = currentFrame;
       const iteration = ((): IteratorResult<
-        ProtectedRecursiveContext<T>,
+        ProtectedRecursiveRequest<T>,
         R
       > => {
         switch (state) {
@@ -172,14 +184,13 @@ export const protectedRecursive = <T, R>(
         currentFrame.result = userResult;
         returnValue = userResult;
         if (cacheParam) {
-          const param = currentFrame.context.payload;
+          const param = currentFrame.request.payload;
           if (!cache.has(param)) {
             cache.set(param, userResult);
           }
         }
       } else {
-        const yieldContext = iteration.value;
-        invokeFrameWithContext(yieldContext);
+        invokeFrameWithRequest(iteration.value);
       }
     }
     return returnValue;
@@ -187,21 +198,3 @@ export const protectedRecursive = <T, R>(
 };
 
 export const recursive = protectedRecursive;
-
-export const composeProtectedFactory = <T, R>(
-  factory: ProtectedRecursiveFactory<T, R>
-): Mapper<T, R> => {
-  return rawRecursive<[source: T], R>(function* (source) {
-    const iterator = factory((payload) => {
-      return {
-        payload,
-      };
-    })(source);
-    let iteration = iterator.next();
-    while (!iteration.done) {
-      const returnValue = yield this.call(iteration.value.payload);
-      iteration = iterator.next(returnValue);
-    }
-    return iteration.value;
-  });
-};
