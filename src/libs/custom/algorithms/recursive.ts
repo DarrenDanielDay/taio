@@ -3,6 +3,7 @@ import type { Creater, Func, Method } from "../../../types/concepts";
 import type { DeepPartial } from "../../../types/object";
 import { die } from "../../../utils/internal/exceptions";
 import { noop } from "../../../utils/typed-function";
+import type { CacheMap } from "../data-structure/interfaces/schema";
 import { argument } from "../functions/argument";
 
 type ProtectedRecursiveParam<T> = [param: T];
@@ -22,8 +23,6 @@ export type RawRecursiveGenerator<P extends AnyParams, R> = RecursiveGenerator<
   P,
   R
 >;
-
-export interface CacheMap<K, V> extends Map<K, V> {}
 
 interface ProtectedRecursiveMemoConfig<T, R> {
   /**

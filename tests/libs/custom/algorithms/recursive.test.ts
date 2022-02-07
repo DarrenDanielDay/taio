@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
-  CacheMap,
   recursive,
   rawRecursive,
   GeneralRecursiveFactory,
   ProtectedRecursiveFactory,
 } from "../../../../src/libs/custom/algorithms/recursive";
+import type { CacheMap } from "../../../../src/libs/custom/data-structure/interfaces/schema";
 import { TypedObject } from "../../../../src/libs/typescript/object";
 import type { Mapper } from "../../../../src/types/concepts";
 
@@ -133,22 +133,11 @@ describe("recursive factory", () => {
   }, 100);
   it("should use custom map to cache", (done) => {
     const underlayingCache = new Map<number, number>();
-    const exclude = ["constructor", "size"] as const;
-    const methodKeys = TypedObject.keys(
-      TypedObject.getOwnPropertyDescriptors(Map.prototype)
-    ).filter((k): k is Exclude<typeof k, typeof exclude[number]> => {
-      const key: string = k;
-      const keys: readonly string[] = exclude;
-      return !keys.includes(key);
-    });
-    // @ts-expect-error Object.fromentries needs to be better typed
-    const cache: CacheMap<number, number> = TypedObject.fromEntries(
-      methodKeys.map(
-        (key) =>
-          // @ts-expect-error Union distribution
-          [key, jest.fn(underlayingCache[key].bind(underlayingCache))] as const
-      )
-    );
+    const cache: CacheMap<number, number> = TypedObject.fromEntries([
+      ["get", jest.fn(underlayingCache.get.bind(underlayingCache))],
+      ["set", jest.fn(underlayingCache.set.bind(underlayingCache))],
+      ["has", jest.fn(underlayingCache.has.bind(underlayingCache))],
+    ] as const);
     const factory = jest.fn(() => cache);
     const fibo = recursive(fiboFactory, {
       memo: {

@@ -55,3 +55,6 @@ export interface IQueue<T> extends IContainer<T> {
   readonly front: T;
   readonly back: T;
 }
+
+export interface CacheMap<K, V>
+  extends Pick<Map<K, V>, "get" | "has" | "set"> {}
