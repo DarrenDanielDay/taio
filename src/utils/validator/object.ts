@@ -1,5 +1,9 @@
 import type { AnyParams } from "../../types/array";
-import type { ConstructorOf, InstanceSource } from "../../types/concepts";
+import type {
+  AnyFunc,
+  ConstructorOf,
+  InstanceSource,
+} from "../../types/concepts";
 import type { EmptyObject } from "../../types/object";
 import type { Validator } from "./common";
 import { isNull } from "./primitive";
@@ -7,10 +11,17 @@ import { isNull } from "./primitive";
 export const isObjectOrNull = (value: unknown): value is object | null =>
   typeof value === "object";
 
+export const isFunction = (value: unknown): value is AnyFunc =>
+  typeof value === "function";
+
+export const isNativeFunction = (func: unknown): boolean =>
+  isFunction(func) &&
+  /{ \[native code\] }$/.test(Function.prototype.toString.call(func));
+
 export const isObjectLike = (
   value: unknown
 ): value is Record<PropertyKey, unknown> =>
-  (!isNull(value) && typeof value === "object") || typeof value === "function";
+  (!isNull(value) && isObjectOrNull(value)) || isFunction(value);
 
 export const isObject =
   <T extends EmptyObject>(schema: {
