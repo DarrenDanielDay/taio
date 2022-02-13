@@ -9,22 +9,22 @@ import { argument } from "../functions/argument";
 type ProtectedRecursiveParam<T> = [param: T];
 type ProtectedRecursiveCaller<T> = Func<
   ProtectedRecursiveParam<T>,
-  ProtectedRecursiveRequest<T>
+  ProtectedRecursiveCallRequest<T>
 >;
 
-export type RecursiveGenerator<T, R> = Generator<T, R, R>;
+export type RecursiveCallGenerator<T, R> = Generator<T, R, R>;
 
-export type ProtectedRecursiveGenerator<T, R> = RecursiveGenerator<
-  ProtectedRecursiveRequest<T>,
+export type ProtectedRecursiveCallGenerator<T, R> = RecursiveCallGenerator<
+  ProtectedRecursiveCallRequest<T>,
   R
 >;
 
-export type RawRecursiveGenerator<P extends AnyParams, R> = RecursiveGenerator<
-  P,
+export type RawRecursiveCallGenerator<
+  P extends AnyParams,
   R
->;
+> = RecursiveCallGenerator<P, R>;
 
-interface ProtectedRecursiveMemoConfig<T, R> {
+interface ProtectedRecursiveCallMemoConfig<T, R> {
   /**
    * Whether to use cache by parameter.
    * default `false`
@@ -37,46 +37,49 @@ interface ProtectedRecursiveMemoConfig<T, R> {
   cacheFactory: Creater<CacheMap<T, R>>;
 }
 
-export interface RecursiveConfig<T, R> {
+interface RecursiveConfig {
   /**
    * Max recursive stack size. `Infinity` by default.
    */
   maxStack: number;
-  memo: ProtectedRecursiveMemoConfig<T, R>;
 }
 
-interface ProtectedRecursiveRequest<T> {
+export interface RecursiveCallConfig<T, R> extends RecursiveConfig {
+  memo: ProtectedRecursiveCallMemoConfig<T, R>;
+}
+
+interface ProtectedRecursiveCallRequest<T> {
   readonly payload: T;
 }
 
-interface RawRecursiveThisContext<P extends AnyParams, R> {
+interface RawRecursiveCallThisContext<P extends AnyParams, R> {
   call: Func<P, P>;
   /**
    * The internal iterator stack.
    * Don't try to invoke `generator.next()` or modify it, or the stack might be corrupted.
    */
-  stack: RawRecursiveGenerator<P, R>[];
+  stack: RawRecursiveCallGenerator<P, R>[];
 }
-interface ProtectedRecursiveThisContext<T> {
+interface ProtectedRecursiveCallThisContext<T> {
   call: ProtectedRecursiveCaller<T>;
 }
 
-interface GeneralRecursiveThisContext<P extends AnyParams> {
+interface GeneralRecursiveCallThisContext<P extends AnyParams> {
   // Not type safe.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   call: Func<P, any>;
 }
 
-export type RawRecursiveFactory<P extends AnyParams, R> = Method<
-  RawRecursiveThisContext<P, R>,
+export type RawRecursiveCallFactory<P extends AnyParams, R> = Method<
+  RawRecursiveCallThisContext<P, R>,
   P,
-  RawRecursiveGenerator<P, R>
+  RawRecursiveCallGenerator<P, R>
 >;
 
-export type ProtectedRecursiveFactory<T, R> = Method<
-  ProtectedRecursiveThisContext<T>,
+export type ProtectedRecursiveCallFactory<T, R> = Method<
+  ProtectedRecursiveCallThisContext<T>,
   ProtectedRecursiveParam<T>,
-  ProtectedRecursiveGenerator<T, R>
+  ProtectedRecursiveCallGenerator<T, R>
 >;
 
 /**
@@ -84,7 +87,7 @@ export type ProtectedRecursiveFactory<T, R> = Method<
  * It's not completely type safe, so make sure to use `yield this.call(param)` to perform a recursive call.
  */
 export type GeneralRecursiveFactory<T, R> = Method<
-  GeneralRecursiveThisContext<ProtectedRecursiveParam<T>>,
+  GeneralRecursiveCallThisContext<ProtectedRecursiveParam<T>>,
   ProtectedRecursiveParam<T>,
   // Not type safe.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,11 +119,11 @@ export type GeneralRecursiveFactory<T, R> = Method<
  * @returns sync recursive result
  */
 export const rawRecursive = <P extends AnyParams, R>(
-  factory: RawRecursiveFactory<P, R>
+  factory: RawRecursiveCallFactory<P, R>
 ): Func<P, R> => {
   return (...args) => {
-    const stack: RawRecursiveGenerator<P, R>[] = [];
-    const ctx: RawRecursiveThisContext<P, R> = {
+    const stack: RawRecursiveCallGenerator<P, R>[] = [];
+    const ctx: RawRecursiveCallThisContext<P, R> = {
       call: argument,
       stack,
     };
@@ -135,11 +138,11 @@ export const rawRecursive = <P extends AnyParams, R>(
     while (true) {
       if (iteration.done) {
         stack.pop();
-        const nextTterator = stack.at(-1);
-        if (!nextTterator) {
+        const nextIterator = stack.at(-1);
+        if (!nextIterator) {
           break;
         }
-        iterator = nextTterator;
+        iterator = nextIterator;
         iteration = iterator.next(iteration.value);
       } else {
         [iterator, iteration] = invoke(iteration.value);
@@ -151,12 +154,14 @@ export const rawRecursive = <P extends AnyParams, R>(
 const stackOverflow = () => die("Stack overflow.");
 const circlularFrame = () =>
   die(
-    "Cannot yield `call` result more than once when the last `yield` is not done, which may lead to infinite loop."
+    "Cannot yield `this.call` result more than once when the last `yield` is not done, which may lead to infinite loop."
   );
 
-const uncheckedCall = () =>
+const uncheckedCall = (...codes: string[]) =>
   die(
-    "Unknown stack frame. Invoke the passed `call` function to create stack frame."
+    `Unknown stack frame. Invoke the passed ${codes
+      .map((code) => `\`${code}\``)
+      .join(" ")} function to create stack frame.`
   );
 
 /**
@@ -187,8 +192,8 @@ const uncheckedCall = () =>
  * @returns sync recursive result
  */
 export const protectedRecursive = <T, R>(
-  factory: ProtectedRecursiveFactory<T, R>,
-  config?: DeepPartial<RecursiveConfig<T, R>>
+  factory: ProtectedRecursiveCallFactory<T, R>,
+  config?: DeepPartial<RecursiveCallConfig<T, R>>
 ) => {
   type StackState = "init" | "started";
   const maxStack = config?.maxStack ?? Infinity;
@@ -209,16 +214,16 @@ export const protectedRecursive = <T, R>(
       return value;
     })();
   const requestState = new WeakMap<
-    ProtectedRecursiveRequest<T>,
+    ProtectedRecursiveCallRequest<T>,
     StackState | { result: R }
   >();
   return rawRecursive<P, R>(function (value) {
     if (cacheParam && cache.has(value)) {
       return createResult(cache.get(value)!);
     }
-    const ctx: ProtectedRecursiveThisContext<T> = {
+    const ctx: ProtectedRecursiveCallThisContext<T> = {
       call: (payload) => {
-        const request: ProtectedRecursiveRequest<T> = Object.freeze({
+        const request: ProtectedRecursiveCallRequest<T> = Object.freeze({
           payload,
         });
         requestState.set(request, "init");
@@ -226,9 +231,9 @@ export const protectedRecursive = <T, R>(
       },
     };
     return function* (
-      this: RawRecursiveThisContext<P, R>,
+      this: RawRecursiveCallThisContext<P, R>,
       passedValue: T
-    ): RawRecursiveGenerator<P, R> {
+    ): RawRecursiveCallGenerator<P, R> {
       if (this.stack.length >= maxStack) {
         return stackOverflow();
       }
@@ -240,7 +245,7 @@ export const protectedRecursive = <T, R>(
           const request = iteration.value;
           const state = requestState.get(request);
           if (state === undefined) {
-            return uncheckedCall();
+            return uncheckedCall("this.call");
           } else if (state === "init") {
             requestState.set(request, "started");
             const param = request.payload;
@@ -262,3 +267,180 @@ export const protectedRecursive = <T, R>(
   });
 };
 export const recursive = protectedRecursive;
+
+interface RecursiveGeneratorValueRequest<T> {
+  readonly type: "value";
+  readonly payload: T;
+}
+
+interface RecursiveGeneratorSequenceRequest<P extends AnyParams> {
+  readonly type: "seq";
+  readonly payload: P;
+}
+
+type RecursiveGeneratorRequest<P extends AnyParams, T> =
+  | RecursiveGeneratorSequenceRequest<P>
+  | RecursiveGeneratorValueRequest<T>;
+
+interface RecursiveGeneratorValueResponse<N> {
+  type: "next";
+  payload: N;
+}
+
+interface RecursiveGeneratorSequenceResponse<R> {
+  type: "return";
+  payload: R;
+}
+
+type RecursiveGeneratorResponse<R, N> =
+  | RecursiveGeneratorSequenceResponse<R>
+  | RecursiveGeneratorValueResponse<N>;
+
+interface RawRecursiveGeneratorThisContext<
+  P extends AnyParams,
+  T,
+  R = void,
+  N = void
+> extends ProtectedRecursiveGeneratorThisContext<P, T> {
+  stack: RecursiveGenerator<P, T, R, N>[];
+}
+
+interface ProtectedRecursiveGeneratorThisContext<P extends AnyParams, T> {
+  value: Func<[value: T], RecursiveGeneratorValueRequest<T>>;
+  sequence: Func<P, RecursiveGeneratorSequenceRequest<P>>;
+}
+
+type RecursiveGenerator<P extends AnyParams, T, R = void, N = void> = Generator<
+  RecursiveGeneratorRequest<P, T>,
+  R,
+  RecursiveGeneratorResponse<R, N>
+>;
+
+export type RawRecursiveGeneratorFactory<
+  P extends AnyParams,
+  T,
+  R = void,
+  N = void
+> = Method<
+  RawRecursiveGeneratorThisContext<P, T, R, N>,
+  P,
+  RecursiveGenerator<P, T, R, N>
+>;
+
+export type ProtectedRecursiveGeneratorFactory<
+  P extends AnyParams,
+  T,
+  R = void,
+  N = void
+> = Method<
+  ProtectedRecursiveGeneratorThisContext<P, T>,
+  P,
+  RecursiveGenerator<P, T, R, N>
+>;
+
+export const rawRecursiveGenerator = <
+  P extends AnyParams,
+  T,
+  R = void,
+  N = void
+>(
+  factory: RawRecursiveGeneratorFactory<P, T, R, N>
+) => {
+  type G = RecursiveGenerator<P, T, R, N>;
+  return function* (...args: P): Generator<T, R, N> {
+    const stack: G[] = [];
+    const ctx: RawRecursiveGeneratorThisContext<P, T, R, N> = {
+      value: (value) => ({
+        type: "value",
+        payload: value,
+      }),
+      sequence: (...args) => ({
+        type: "seq",
+        payload: args,
+      }),
+      stack,
+    };
+    const invoke = (args: P) => {
+      const iterator = factory.apply(ctx, args);
+      const initIteration = iterator.next();
+      stack.push(iterator);
+      return [iterator, initIteration] as const;
+    };
+    let [iterator, iteration] = invoke(args);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
+      if (iteration.done) {
+        stack.pop();
+        const nextIterator = stack.at(-1);
+        if (!nextIterator) {
+          break;
+        }
+        iterator = nextIterator;
+        iteration = iterator.next({ type: "return", payload: iteration.value });
+      } else {
+        const request = iteration.value;
+        if (request.type === "seq") {
+          [iterator, iteration] = invoke(request.payload);
+        } else {
+          const next = yield request.payload;
+          iteration = iterator.next({ type: "next", payload: next });
+        }
+      }
+    }
+    return iteration.value;
+  };
+};
+
+export const protectedRecursiveGenerator = <
+  P extends AnyParams,
+  T,
+  R = void,
+  N = void
+>(
+  factory: ProtectedRecursiveGeneratorFactory<P, T, R, N>,
+  config?: Partial<RecursiveConfig>
+) => {
+  const maxStack = config?.maxStack ?? Infinity;
+
+  return rawRecursiveGenerator<P, T, R, N>(function (...args: P) {
+    const trackedRequests = new WeakSet<RecursiveGeneratorRequest<P, T>>();
+    const ctx: ProtectedRecursiveGeneratorThisContext<P, T> = {
+      value: (value) => {
+        const result = this.value(value);
+        trackedRequests.add(result);
+        Object.freeze(result);
+        return result;
+      },
+      sequence: (...args: P) => {
+        const result = this.sequence(...args);
+        trackedRequests.add(result);
+        Object.freeze(result);
+        return result;
+      },
+    };
+    return function* (
+      this: RawRecursiveGeneratorThisContext<P, T, R, N>,
+      ...passedArgs: P
+    ): RecursiveGenerator<P, T, R, N> {
+      if (this.stack.length >= maxStack) {
+        return stackOverflow();
+      }
+      const generator = factory.apply(ctx, passedArgs);
+      let iteration = generator.next();
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      while (true) {
+        if (!iteration.done) {
+          const request = iteration.value;
+          if (!trackedRequests.has(request)) {
+            return uncheckedCall("this.value", "this.sequence");
+          }
+          iteration = generator.next(yield request);
+        } else {
+          return iteration.value;
+        }
+      }
+    }.apply(this, args);
+  });
+};
+
+export const recursiveGenerator = protectedRecursiveGenerator;

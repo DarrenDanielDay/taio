@@ -1,3 +1,5 @@
+import type { Func } from "../../../../types/concepts";
+
 export interface IContainer<T> extends Iterable<T> {
   /**
    * The number of elements in the container.
@@ -56,5 +58,8 @@ export interface IQueue<T> extends IContainer<T> {
   readonly back: T;
 }
 
-export interface CacheMap<K, V>
-  extends Pick<Map<K, V>, "get" | "has" | "set"> {}
+export interface CacheMap<K, V> extends Pick<Map<K, V>, "get" | "has"> {
+  set: (key: K, value: V) => this;
+}
+
+export type Comparator<T> = Func<[a: T, b: T], number>;

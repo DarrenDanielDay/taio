@@ -3,11 +3,15 @@ import {
   recursive,
   rawRecursive,
   GeneralRecursiveFactory,
-  ProtectedRecursiveFactory,
+  ProtectedRecursiveCallFactory,
+  rawRecursiveGenerator,
+  protectedRecursiveGenerator,
+  ProtectedRecursiveGeneratorFactory,
+  recursiveGenerator,
 } from "../../../../src/libs/custom/algorithms/recursive";
 import type { CacheMap } from "../../../../src/libs/custom/data-structure/interfaces/schema";
 import { TypedObject } from "../../../../src/libs/typescript/object";
-import type { Mapper } from "../../../../src/types/concepts";
+import type { Func, Mapper } from "../../../../src/types/concepts";
 
 describe("recursive factory", () => {
   type NumRecursiveMappingFactory = GeneralRecursiveFactory<number, number>;
@@ -157,7 +161,7 @@ describe("recursive factory", () => {
   }, 100);
   it("should not infinite loop with tricky cache", () => {
     let ctx: ReturnType<
-      ThisParameterType<ProtectedRecursiveFactory<number, number>>["call"]
+      ThisParameterType<ProtectedRecursiveCallFactory<number, number>>["call"]
     > | null = null;
     const fn = recursive<number, number>(function* (n) {
       if (!ctx) {
@@ -185,5 +189,92 @@ describe("recursive factory", () => {
     }).not.toThrow();
     const result = fn(1);
     expect(result).toBe(2);
+  });
+});
+
+describe("recursive generator factory", () => {
+  const countDownFactory: ProtectedRecursiveGeneratorFactory<
+    [n: number],
+    number
+  > = function* (n) {
+    if (n === 0) {
+      return;
+    }
+    yield this.value(n);
+    yield this.sequence(n - 1);
+  };
+  const testCountDownLogic = (
+    fn: Func<[number], Generator<number, void, void>>,
+    testN: number
+  ) =>
+    expect([...fn(testN - 1)]).toStrictEqual(
+      Array.from({ length: testN - 1 }, (_, i) => testN - 1 - i)
+    );
+  it("should not stack overflow without limit", () => {
+    const testN = 10000;
+    const fn1 = rawRecursiveGenerator(countDownFactory);
+    const fn2 = protectedRecursiveGenerator(countDownFactory);
+    testCountDownLogic(fn1, testN);
+    testCountDownLogic(fn2, testN);
+  });
+  it("should throw stack overflow with limit", () => {
+    const testN = 10000;
+    const greaterThanMax = protectedRecursiveGenerator(countDownFactory, {
+      maxStack: testN - 1,
+    });
+    const exactMax = protectedRecursiveGenerator(countDownFactory, {
+      maxStack: testN,
+    });
+    const lessThanMax = protectedRecursiveGenerator(countDownFactory, {
+      maxStack: testN + 1,
+    });
+    const noRecursive = protectedRecursiveGenerator(countDownFactory, {
+      maxStack: 1,
+    });
+    expect(() => {
+      testCountDownLogic(lessThanMax, testN);
+    }).not.toThrow();
+    expect(() => {
+      testCountDownLogic(exactMax, testN);
+    }).not.toThrow();
+    const stackOverflow = /stack overflow/i;
+    expect(() => {
+      testCountDownLogic(greaterThanMax, testN);
+    }).toThrow(stackOverflow);
+    expect(() => {
+      testCountDownLogic(noRecursive, 1);
+    }).not.toThrow();
+    expect(() => {
+      testCountDownLogic(noRecursive, 2);
+    }).toThrow(stackOverflow);
+  });
+  it("should throw with unchecked request", () => {
+    expect(() => {
+      const fn = recursiveGenerator<[], number>(function* () {
+        yield {
+          type: "value",
+          payload: 0,
+        };
+      });
+      [...fn()];
+    }).toThrow(/unknown/i);
+  });
+  it("should freeze requests", () => {
+    expect(() => {
+      const fn = recursiveGenerator<[], number>(function* () {
+        const valReq = this.value(0);
+        // @ts-expect-error Directive as type check
+        valReq.payload = 2;
+      });
+      [...fn()];
+    }).toThrow();
+    expect(() => {
+      const fn = recursiveGenerator<[], number>(function* () {
+        const valReq = this.sequence();
+        // @ts-expect-error Directive as type check
+        valReq.payload = [];
+      });
+      [...fn()];
+    }).toThrow();
   });
 });
