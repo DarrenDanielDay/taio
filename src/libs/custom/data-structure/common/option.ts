@@ -4,16 +4,21 @@ export interface Option<T> {
   value?: T;
 }
 
-export const some = <T extends unknown>(value: T): Option<T> => ({ value });
-export const none = <T extends unknown>(): Option<T> => ({});
+export interface None {}
+
+export interface Some<T> {
+  value: T;
+}
+
+export const some = <T extends unknown>(value: T): Some<T> => ({ value });
+export const none = (): None => ({});
 
 export const hasSome = <T extends unknown>(
   option: Option<T>
-): option is Required<Option<T>> => Reflect.has(option, "value");
+): option is Some<T> => Reflect.has(option, "value");
 
-export const hasNone = <T extends unknown>(
-  option: Option<T>
-): option is Omit<Option<T>, "value"> => !Reflect.has(option, "value");
+export const hasNone = <T extends unknown>(option: Option<T>): option is None =>
+  !Reflect.has(option, "value");
 
 export const match = <T, R>(
   option: Option<T>,

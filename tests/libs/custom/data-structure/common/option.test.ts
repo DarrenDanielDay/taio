@@ -20,7 +20,7 @@ describe("option logic", () => {
   it("should match none", () => {
     const fail = jest.fn<number, []>(() => -1);
     const success = jest.fn<number, [number]>(identity);
-    const option = none<number>();
+    const option = none();
     expect(hasNone(option)).toBe(true);
     expect(match(option, success, fail)).toBe(-1);
     expect(success).not.toBeCalled();
